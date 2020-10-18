@@ -1,7 +1,6 @@
 import math
 
 class Vector:
-    
     """Vetor de 3 elementos"""
     def __init__(self, x=0.0, y=0.0, z=0.0):
         self.x = x
@@ -36,3 +35,6 @@ class Vector:
     def __truediv__(self, other):
         assert not isinstance(other, Vector)
         return Vector(self.x / other, self.y / other, self.z / other)
+    
+    def __eq__(self, other):
+        return (self.x == other.x) and (self.y == other.y) and (self.z == other.z)

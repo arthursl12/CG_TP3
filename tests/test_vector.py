@@ -12,21 +12,18 @@ class TestVector:
     
     def test_addition(self):
         sum = self.v1 + self.v2
-        assert sum.x == 4.0
-        assert sum.y == 4.0
-        assert sum.z == 7.0
+        assert sum == Vector(4.0, 4.0, 7.0)
     
     def test_multiplication(self):
         p = self.v1 * 2 
-        assert p.x ==  2.0
-        assert p.y == -4.0
-        assert p.z == -4.0
+        assert p == Vector(2.0, -4.0, -4.0)
     
     def test_division(self):
         p = self.v1 / 2 
-        assert p.x ==  0.5
-        assert p.y == -1.0
-        assert p.z == -1.0
+        assert p == Vector(0.5, -1.0, -1.0)
+    
+    def test_equality(self):
+        assert self.v1 == self.v1
 
 
 
