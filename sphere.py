@@ -21,3 +21,7 @@ class Sphere:
             if dist > 0:
                 return dist
         return None  
+    
+    def normal(self, surface_point):
+        """Retorna a normal no ponto da superfície da esfera"""
+        return (surface_point - self.center).normalize()
