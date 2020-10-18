@@ -7,8 +7,8 @@ from engine import RenderEngine
 from light import Light
 from material import Material, ChequeredMaterial
 
-WIDTH = 1920
-HEIGHT = 1080
+WIDTH = 1280
+HEIGHT = 720
 
 RENDERED_IMG = "2balls.ppm"
 CAMERA = Vector(0,-0.35,-1)
@@ -24,12 +24,12 @@ OBJECTS = [
             reflection=0.2
         )),
     # Bola Azul
-    Sphere(Point(0.75, -0.1, 1), 0.6, Material(Color.from_hex("#0000FF"))),
+    Sphere(Point(0.75, -0.1, 1), 0.6, Material(Color.from_hex("#D3D3D3"), diffuse=0.1, specular=0.9, reflection=1.0)),
     # Bola Rosa
     Sphere(Point(-0.75, -0.1, 2.25), 0.6, Material(Color.from_hex("#803980")))
 ]
 LIGHTS = [
     Light(Point(1.5,-.5,-10), Color.from_hex("#FFFFFF")),
-    Light(Point(1.5,-.5,-10), Color.from_hex("#FFFFFF")),
-    Light(Point(1.5,-.5,10), Color.from_hex("#FFFFFF")),
+
+    Light(Point(1.5,-.5,-10), Color.from_hex("#FFFFFF"))
 ]
