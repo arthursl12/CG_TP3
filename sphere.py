@@ -32,7 +32,6 @@ class Sphere:
                 else:
                     if x1 < dist:
                         return x1, Hit.HIT
-                return dist
         return dist, Hit.MISS
     
     def normal(self, surface_point):

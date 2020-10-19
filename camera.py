@@ -15,7 +15,7 @@ class Camera:
         
         w = (eye - look_at).normalize()     # Contrário da direção que estamos olhando
         u = (up.cross_product(w)).normalize()             # Direita, no plano de projeção
-        v = w.cross_product(u)              # Cima, no plano de projeção
+        v = u.cross_product(w)              # Cima, no plano de projeção
         
         
         self.eye = eye
