@@ -4,6 +4,7 @@ from vector import Vector
 from ray import Ray
 from point import Point
 from color import Color
+from sphere import Hit
 
 class RenderEngine:
     """Renderiza os objetos no plano de renderização"""
@@ -34,7 +35,7 @@ class RenderEngine:
     def ray_trace(self, ray, scene, depth=0):
         color = Color(0,0,0)
         # Encontra o objeto mais próximo que o raio intercepta
-        dist_hit, obj_hit = self.find_nearest(ray, scene)
+        dist_hit, obj_hit,case = self.find_nearest(ray, scene)
         if obj_hit is None:
             return color
         hit_pos = ray.origin + ray.direction * dist_hit
@@ -53,15 +54,18 @@ class RenderEngine:
         return color
 
     def find_nearest(self, ray, scene):
-        dist_min = None
+        dist_min = float('inf')
         obj_hit = None
+        result = 0
 
         for obj in scene.objects:
-            dist = obj.intersects(ray)
-            if dist is not None and (obj_hit is None or dist < dist_min):
-                dist_min = dist
+            new_dist, case = obj.intersects(ray, dist_min)
+            if (case != Hit.MISS):
+                result = case
                 obj_hit = obj
-        return dist_min, obj_hit
+                dist_min = new_dist
+
+        return dist_min, obj_hit, case
     
     def color_at(self, obj_hit, hit_pos, normal, scene):
         material = obj_hit.material
