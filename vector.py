@@ -12,6 +12,13 @@ class Vector:
     
     def dot_product(self, other):
         return self.x * other.x + self.y * other.y + self.z * other.z
+
+    def cross_product(self, other):
+        res = Vector(
+            self.y * other.z - self.z * other.y,
+            self.z * other.x - self.x * other.z,
+            self.x * other.y - self.y * other.x)
+        return res
     
     def magnitude(self):
         return math.sqrt(self.dot_product(self))

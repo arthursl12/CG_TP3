@@ -17,7 +17,7 @@ class RenderEngine:
         aspect_ratio = float(width) / height
 
         # camera = scene.camera
-        camera = Camera(Vector(0,0,0), 45, aspect_ratio)
+        camera = scene.camera
         ## TODO: tratamento do ângulo para (1) não poder ser 90° e (2) não ter tangente negativa
         pixels = Image(width, height)
 
@@ -33,7 +33,6 @@ class RenderEngine:
     
     def ray_trace(self, ray, scene, depth=0):
         color = Color(0,0,0)
-
         # Encontra o objeto mais próximo que o raio intercepta
         dist_hit, obj_hit = self.find_nearest(ray, scene)
         if obj_hit is None:
@@ -67,7 +66,7 @@ class RenderEngine:
     def color_at(self, obj_hit, hit_pos, normal, scene):
         material = obj_hit.material
         obj_color = material.color_at(hit_pos)
-        to_cam = scene.camera - hit_pos
+        to_cam = scene.camera.eye - hit_pos
         color = material.ambient * Color.from_hex("#000000")
         specular_k = 50
 

@@ -6,6 +6,7 @@ from vector import Vector
 from point import Point
 from sphere import Sphere
 from scene import Scene
+from camera import Camera
 from engine import RenderEngine
 from light import Light
 from material import Material
@@ -19,7 +20,9 @@ def main():
     args = parser.parse_args()
     mod = importlib.import_module(args.scene)
 
-    scene = Scene(mod.CAMERA, mod.OBJECTS, mod.LIGHTS, mod.WIDTH, mod.HEIGHT)
+    aspect_ratio = float(mod.WIDTH) / mod.HEIGHT
+    camera = Camera(mod.CAMERA, Vector(0,0,0), Vector(0,1,0), 45, aspect_ratio)
+    scene = Scene(camera, mod.OBJECTS, mod.LIGHTS, mod.WIDTH, mod.HEIGHT)
     engine = RenderEngine()
     image = engine.render(scene)
 
