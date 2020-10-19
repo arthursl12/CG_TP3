@@ -23,13 +23,23 @@ OBJECTS = [
             ambient=0.2,
             reflection=0.2
         )),
-    # Bola Azul
-    Sphere(Point(0.75, 3, 10.0), 0.6, Material(Color.from_hex("#D3D3D3"), diffuse=0.1, specular=0.9, reflection=1.0)),
+    # Bola Prata
+    Sphere(Point(0, 1, 0), 0.6, Material(Color.from_hex("#D3D3D3"), diffuse=0.1, specular=0.9, reflection=1.0)),
+    Sphere(Point(0, 3, 0), 0.6, Material(Color.from_hex("#D3D3D3"), diffuse=0.1, specular=0.9, reflection=1.0)),
+    Sphere(Point(0, 7, 0), 0.6, Material(Color.from_hex("#D3D3D3"), diffuse=0.1, specular=0.9, reflection=1.0)),
+    
     # Bola Rosa
-    Sphere(Point(-0.75, 0.5, 2.25), 0.6, Material(Color.from_hex("#803980")))
+    Sphere(Point(1, 0, 0), 0.6, Material(Color.from_hex("#803980"))),
+    Sphere(Point(3, 0, 0), 0.6, Material(Color.from_hex("#803980"))),
+    Sphere(Point(7, 0, 0), 0.6, Material(Color.from_hex("#803980"))),
+    
+    # Bola Verde
+    Sphere(Point(0, 0, 1), 0.6, Material(Color.from_hex("#228b22"))),
+    Sphere(Point(0, 0, 3), 0.6, Material(Color.from_hex("#228b22"))),
+    Sphere(Point(0, 0, 7), 0.6, Material(Color.from_hex("#228b22")))
 ]
 LIGHTS = [
     Light(Point(1.5,.5,-10), Color.from_hex("#FFFFFF")),
-
+    Light(Point(10, 10, 10), Color.from_hex("#FFFFFF")),
     Light(Point(1.5,.5,-10), Color.from_hex("#FFFFFF"))
 ]
