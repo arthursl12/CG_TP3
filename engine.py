@@ -35,22 +35,24 @@ class RenderEngine:
     def ray_trace(self, ray, scene, depth=0):
         color = Color(0,0,0)
         # Encontra o objeto mais próximo que o raio intercepta
-        dist_hit, obj_hit,case = self.find_nearest(ray, scene)
+        dist_hit, obj_hit, case = self.find_nearest(ray, scene)
         if obj_hit is None:
             return color
         hit_pos = ray.origin + ray.direction * dist_hit
         hit_normal = obj_hit.normal(hit_pos)
-        color += self.color_at(obj_hit, hit_pos, hit_normal, scene)
+        color += self.color_at(obj_hit, hit_pos, hit_normal, scene, ray)
 
-        if depth < self.MAX_DEPTH:
+        if (depth < self.MAX_DEPTH and obj_hit.material.reflection > 0):
             new_ray_pos = hit_pos + hit_normal * self.MIN_DISPLACE
             new_ray_dir = ray.direction - 2 * ray.direction.dot_product(hit_normal) * hit_normal
             new_ray = Ray(new_ray_pos, new_ray_dir)
 
             # Atenuar o raio refletido pelo coeficiente de reflexão
             color += self.ray_trace(new_ray, scene, depth+1) * obj_hit.material.reflection
+            color += obj_hit.material.reflection * obj_hit.material.color_at(hit_pos) * 0.3
 
-
+                    
+                
         return color
 
     def find_nearest(self, ray, scene):
@@ -67,7 +69,7 @@ class RenderEngine:
 
         return dist_min, obj_hit, case
     
-    def color_at(self, obj_hit, hit_pos, normal, scene):
+    def color_at(self, obj_hit, hit_pos, normal, scene, ray=Vector(0,0,0)):
         material = obj_hit.material
         obj_color = material.color_at(hit_pos)
         to_cam = scene.camera.eye - hit_pos
@@ -76,21 +78,44 @@ class RenderEngine:
 
         # Cálculos de iluminação
         for light in scene.lights:
-            to_light = Ray(hit_pos, light.position - hit_pos)
-
+            inter_to_light = (light.position - hit_pos).normalize()
+            
             # Difusa
-            color += (
-                obj_color 
-                * material.diffuse 
-                * max(normal.dot_product(to_light.direction),0) 
-            )
+            if (material.diffuse > 0):
+                diffuse_coeff = (
+                    max(normal.dot_product(inter_to_light),0) 
+                    * material.diffuse
+                )
+                color += (
+                    diffuse_coeff
+                    * obj_color
+                )
+                # color += (
+                #     diffuse_coeff
+                #     * light.color
+                #     * 0.1
+                # )
+            
+            
+            
             # Specular (Blinn-Phong)
-            half_vector = (to_light.direction + to_cam).normalize()
-            color += (
-                light.color 
-                * material.specular 
-                * max(normal.dot_product(half_vector), 0) ** specular_k
-            )
+            # half_vector = (to_light.direction + to_cam).normalize()
+            # color += (
+            #     light.color 
+            #     * material.specular 
+            #     * max(normal.dot_product(half_vector), 0) ** specular_k
+            # )
+            
+            if (material.specular > 0):
+                V = ray.direction
+                R = inter_to_light - 2.0 * inter_to_light.dot_product(normal) * normal
+                dot = V.dot_product(R)
+                if (dot > 0):
+                    spec = (dot ** 20) * material.specular
+                    color += (
+                        light.color
+                        * spec
+                    )
         
         return color
 

@@ -21,7 +21,7 @@ def main():
     mod = importlib.import_module(args.scene)
 
     aspect_ratio = float(mod.WIDTH) / mod.HEIGHT
-    camera = Camera(mod.CAMERA, Vector(0,0,0), Vector(0,1,0), 45, aspect_ratio)
+    camera = Camera(mod.CAMERA, Vector(0,0,0), Vector(0,1,0), 20, aspect_ratio)
     scene = Scene(camera, mod.OBJECTS, mod.LIGHTS, mod.WIDTH, mod.HEIGHT)
     engine = RenderEngine()
     image = engine.render(scene)
