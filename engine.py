@@ -1,4 +1,6 @@
 from image import Image
+from camera import Camera
+from vector import Vector
 from ray import Ray
 from point import Point
 from color import Color
@@ -14,24 +16,19 @@ class RenderEngine:
         height = scene.height
         aspect_ratio = float(width) / height
 
-        x0 = -1.0
-        x1 = +1.0
-        x_step = (x1 - x0) / (width - 1)
-
-        y0 = -1.0 / aspect_ratio
-        y1 = +1.0 / aspect_ratio
-        y_step = (y1 - y0) / (height - 1)
-
-        camera = scene.camera
+        # camera = scene.camera
+        camera = Camera(Vector(0,0,0), 45, aspect_ratio)
+        ## TODO: tratamento do ângulo para (1) não poder ser 90° e (2) não ter tangente negativa
         pixels = Image(width, height)
 
-        for j in range(height):
-            y = y0 + j * y_step
-            for i in range(width):
-                x = x0 + i * x_step
-                ray = Ray(camera, Point(x,y) - camera)
-                pixels.set_pixel(i,j,self.ray_trace(ray, scene))
-            print(f"{float(j)/float(height) * 100:3.0f}%", end="\r")
+        for j in reversed(range(height)):
+            for i in reversed(range(width)):
+                u = float(i) / (width-1)
+                v = float(j) / (height-1)
+                ray = camera.get_ray(u, v)
+                color = self.ray_trace(ray, scene)
+                pixels.set_pixel(i, j, color)
+            print(f"{float(height-j)/float(height) * 100:3.0f}%", end="\r")
         return pixels
     
     def ray_trace(self, ray, scene, depth=0):
