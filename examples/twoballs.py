@@ -38,7 +38,10 @@ OBJECTS = [
     # Bola Verde
     Sphere(Point(0, 0, 1), 0.6, Material(Color.from_hex("#228b22"))),
     Sphere(Point(0, 0, 3), 0.6, Material(Color.from_hex("#228b22"))),
-    Sphere(Point(0, 0, 7), 0.6, Material(Color.from_hex("#228b22")))
+    Sphere(Point(0, 0, 7), 0.6, Material(Color.from_hex("#228b22"))),
+    
+    # Bola Vidro
+    Sphere(Point(3, 0, 3), 0.6, Material(Color.from_hex("#228b22"),refraction=0.8,refrIndex=1.3))
 ]
 LIGHTS = [
     # Light(Point(1.5,.5,-10), Color.from_hex("#FFFFFF")),
