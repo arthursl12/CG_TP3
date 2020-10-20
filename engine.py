@@ -5,6 +5,7 @@ from ray import Ray
 from point import Point
 from color import Color
 from sphere import Hit
+from light import LightType
 
 class RenderEngine:
     """Renderiza os objetos no plano de renderização"""
@@ -78,8 +79,23 @@ class RenderEngine:
 
         # Cálculos de iluminação
         for light in scene.lights:
-            inter_to_light = (light.position - hit_pos).normalize()
+            shade = 1.0
             
+            # Sombras pontuais
+            if (light.type == LightType.POINT):
+                L = light.position - hit_pos
+                dist = L.magnitude()
+                L *= 1.0 / dist
+                r = Ray(hit_pos + L * self.MIN_DISPLACE, L)
+                
+                for obj in scene.objects:
+                    new_dist, case = obj.intersects(r, dist)
+                    if (case != Hit.MISS):
+                        shade = 0
+                        break 
+
+    
+            inter_to_light = (light.position - hit_pos).normalize()
             # Difusa
             if (material.diffuse > 0):
                 diffuse_coeff = (
@@ -89,6 +105,7 @@ class RenderEngine:
                 color += (
                     diffuse_coeff
                     * obj_color
+                    * shade
                 )
                 # color += (
                 #     diffuse_coeff
@@ -115,6 +132,7 @@ class RenderEngine:
                     color += (
                         light.color
                         * spec
+                        * shade
                     )
         
         return color
