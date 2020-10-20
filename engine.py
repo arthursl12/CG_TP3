@@ -34,8 +34,7 @@ class RenderEngine:
             print(f"{float(height-j)/float(height) * 100:3.0f}%", end="\r")
         return pixels
     
-    def ray_trace(self, ray, scene, depth=0, aRIndex=1, dist=float('inf')):
-        color = Color(0,0,0)
+    def ray_trace(self, ray, scene, depth=0, aRIndex=1, dist=float('inf'), color=Color(0,0,0)):
         # Encontra o objeto mais próximo que o raio intercepta
         dist, obj_hit, case = self.find_nearest(ray, scene)
         if obj_hit is None:
@@ -60,22 +59,22 @@ class RenderEngine:
             refr = obj_hit.material.refraction
             rindex = obj_hit.material.refrIndex
             n = aRIndex / rindex
-            N = hit_normal * case.value      # Normal depende se é interna ou externa
-            cosI  = -N.dot_product(ray.direction)
+            N = hit_normal * (float)(case.value)      # Normal depende se é interna ou externa
+            cosI  = -(N.dot_product(ray.direction))
             cosT2 = 1.0 - n * n * (1.0 - cosI * cosI)
             if (cosT2 > 0):
                 T = (n * ray.direction) + (n * cosI - math.sqrt(cosT2)) * N
                 r = Ray(hit_pos + T * self.MIN_DISPLACE, T)
-                rcolor, dist = self.ray_trace(r, scene, depth+1, rindex, dist)
-                absorb = obj_hit.material.color_at(hit_pos) * 0.15 * -dist
-                transp = Color(
-                    math.exp(absorb.x), 
-                    math.exp(absorb.y), 
-                    math.exp(absorb.z)
-                )
+                rcolor, dist = self.ray_trace(r, scene, depth+1, rindex)
+                # absorb = self.color_at(obj_hit, hit_pos, hit_normal, scene, ray) * 0.0009 * -dist
+                # transp = Color(
+                #     math.exp(absorb.x), 
+                #     math.exp(absorb.y), 
+                #     math.exp(absorb.z)
+                # )
                 # color += rcolor * transp  
-                color += transp
                 # color += rcolor.cross_product(transp)
+                color += rcolor
                 # color += transp  
         return color, dist
 

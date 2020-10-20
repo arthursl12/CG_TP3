@@ -29,6 +29,7 @@ class Sphere:
                 if x1 < 0:
                     if x2 < dist:
                         return x2, Hit.INSIDE
+
                 else:
                     if x1 < dist:
                         return x1, Hit.HIT
