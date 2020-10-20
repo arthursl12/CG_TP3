@@ -12,7 +12,7 @@ class RenderEngine:
     """Renderiza os objetos no plano de renderização"""
 
     MAX_DEPTH = 5
-    MIN_DISPLACE = 0.0001
+    MIN_DISPLACE = 0.1
 
     def render(self, scene):
         width = scene.width
@@ -29,17 +29,20 @@ class RenderEngine:
                 u = float(i) / (width-1)
                 v = float(j) / (height-1)
                 ray = camera.get_ray(u, v)
-                color, dist = self.ray_trace(ray, scene)
+                color = Color(0,0,0)
+                dist = float('inf')
+                RIndex = 1.0
+                color, dist, RIndex = self.ray_trace(ray, scene, t=dist, aRIndex=RIndex, color=color, depth=0)
                 pixels.set_pixel(i, j, color)
             print(f"{float(height-j)/float(height) * 100:3.0f}%", end="\r")
         return pixels
     
-    def ray_trace(self, ray, scene, depth=0, aRIndex=1, dist=float('inf'), color=Color(0,0,0)):
+    def ray_trace(self, ray, scene, aRIndex, t, color, depth=0):
         # Encontra o objeto mais próximo que o raio intercepta
-        dist, obj_hit, case = self.find_nearest(ray, scene)
+        t, obj_hit, case = self.find_nearest(ray, scene)
         if obj_hit is None:
-            return color, dist
-        hit_pos = ray.origin + ray.direction * dist
+            return color, t, aRIndex
+        hit_pos = ray.origin + ray.direction * t
         hit_normal = obj_hit.normal(hit_pos)
         color += self.color_at(obj_hit, hit_pos, hit_normal, scene, ray)
 
@@ -50,7 +53,7 @@ class RenderEngine:
             new_ray = Ray(new_ray_pos, new_ray_dir)
 
             # Atenuar o raio refletido pelo coeficiente de reflexão
-            rcol, dist = self.ray_trace(new_ray, scene, depth+1)
+            rcol, t, aRIndex = self.ray_trace(new_ray, scene, aRIndex=aRIndex, t=t, depth=depth+1, color=color)
             color += rcol * obj_hit.material.reflection
             color += obj_hit.material.reflection * obj_hit.material.color_at(hit_pos) * 0.3
 
@@ -65,7 +68,7 @@ class RenderEngine:
             if (cosT2 > 0):
                 T = (n * ray.direction) + (n * cosI - math.sqrt(cosT2)) * N
                 r = Ray(hit_pos + T * self.MIN_DISPLACE, T)
-                rcolor, dist = self.ray_trace(r, scene, depth+1, rindex)
+                rcolor, rdist, rindex = self.ray_trace(r, scene, depth=depth+1, aRIndex=rindex, t=float('inf'), color=Color(0,0,0))
                 # absorb = self.color_at(obj_hit, hit_pos, hit_normal, scene, ray) * 0.0009 * -dist
                 # transp = Color(
                 #     math.exp(absorb.x), 
@@ -76,23 +79,23 @@ class RenderEngine:
                 # color += rcolor.cross_product(transp)
                 color += rcolor
                 # color += transp  
-        return color, dist
+        return color, t, aRIndex
 
     def find_nearest(self, ray, scene):
-        dist_min = float('inf')
+        t_min = float('inf')
         obj_hit = None
-        result = 0
+        result = Hit.MISS
 
         for obj in scene.objects:
-            new_dist, case = obj.intersects(ray, dist_min)
+            new_t, case = obj.intersects(ray, t_min)
             if (case != Hit.MISS):
                 result = case
                 obj_hit = obj
-                dist_min = new_dist
+                t_min = new_t
 
-        return dist_min, obj_hit, case
+        return t_min, obj_hit, result
     
-    def color_at(self, obj_hit, hit_pos, normal, scene, ray=Vector(0,0,0)):
+    def color_at(self, obj_hit, hit_pos, normal, scene, ray):
         material = obj_hit.material
         obj_color = material.color_at(hit_pos)
         to_cam = scene.camera.eye - hit_pos
@@ -123,11 +126,11 @@ class RenderEngine:
                     diffuse_coeff = (
                         max(normal.dot_product(inter_to_light),0) 
                         * material.diffuse
+                        * shade
                     )
                     color += (
                         diffuse_coeff
                         * obj_color
-                        * shade
                     )
                     # color += (
                     #     diffuse_coeff
