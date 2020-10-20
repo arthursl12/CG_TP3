@@ -11,7 +11,7 @@ LIBS :=
 INC := -I include -I third-party -L. 
 
 
-MODULES = 
+MODULES = vec3
 SOURCES = $(addsuffix .cpp,$(MODULES))
 OBJECTS = $(patsubst %.cpp, %.o, $(SOURCES))
 TESTS = $(addprefix test_,$(SOURCES))
