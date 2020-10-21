@@ -53,7 +53,7 @@ class RenderEngine:
             new_ray = Ray(new_ray_pos, new_ray_dir)
 
             # Atenuar o raio refletido pelo coeficiente de reflexão
-            rcol, t, aRIndex = self.ray_trace(new_ray, scene, aRIndex=aRIndex, t=t, depth=depth+1, color=color)
+            rcol, t, raRIndex = self.ray_trace(new_ray, scene, aRIndex=aRIndex, t=t, depth=depth+1, color=color)
             color += rcol * obj_hit.material.reflection
             color += obj_hit.material.reflection * obj_hit.material.color_at(hit_pos) * 0.3
 
@@ -68,7 +68,7 @@ class RenderEngine:
             if (cosT2 > 0):
                 T = (n * ray.direction) + (n * cosI - math.sqrt(cosT2)) * N
                 r = Ray(hit_pos + T * self.MIN_DISPLACE, T)
-                rcolor, rdist, rindex = self.ray_trace(r, scene, depth=depth+1, aRIndex=rindex, t=float('inf'), color=Color(0,0,0))
+                rcol, t, raRIndex = self.ray_trace(r, scene, depth=depth+1, aRIndex=rindex, t=float('inf'), color=Color(0,0,0))
                 # absorb = self.color_at(obj_hit, hit_pos, hit_normal, scene, ray) * 0.0009 * -dist
                 # transp = Color(
                 #     math.exp(absorb.x), 
@@ -77,7 +77,7 @@ class RenderEngine:
                 # )
                 # color += rcolor * transp  
                 # color += rcolor.cross_product(transp)
-                color += rcolor
+                color += rcol
                 # color += transp  
         return color, t, aRIndex
 

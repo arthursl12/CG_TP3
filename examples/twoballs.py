@@ -11,7 +11,7 @@ WIDTH = 1280
 HEIGHT = 720
 
 RENDERED_IMG = "2balls.ppm"
-CAMERA = Vector(5,3,10)
+CAMERA = Vector(40,3,50)
 OBJECTS = [
     # Plano chão
     Sphere(
@@ -51,6 +51,15 @@ OBJECTS = [
         refrIndex=1.3)),
 
     Sphere(Point(1.5, 0, 3), 0.6, Material(
+        Color.from_hex("#FFFFFF"),
+        diffuse=0.02, 
+        specular=0.9, 
+        ambient=0.9, 
+        reflection=0.05, 
+        refraction=0.8,
+        refrIndex=1.3)),
+    
+    Sphere(Point(20, 0, 20), 0.6, Material(
         Color.from_hex("#FFFFFF"),
         diffuse=0.02, 
         specular=0.9, 
