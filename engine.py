@@ -1,12 +1,15 @@
 import math
-from image import Image
+import random
+
 from camera import Camera
-from vector import Vector
-from ray import Ray
-from point import Point
 from color import Color
-from sphere import Hit
+from image import Image
 from light import LightType
+from point import Point
+from ray import Ray
+from sphere import Hit
+from vector import Vector
+
 
 class RenderEngine:
     """Renderiza os objetos no plano de renderização"""
@@ -14,11 +17,11 @@ class RenderEngine:
     MAX_DEPTH = 5
     MIN_DISPLACE = 0.1
 
-    def render(self, scene):
+    def render(self, scene, qtd_samples):
         width = scene.width
         height = scene.height
         aspect_ratio = float(width) / height
-
+        
         # camera = scene.camera
         camera = scene.camera
         ## TODO: tratamento do ângulo para (1) não poder ser 90° e (2) não ter tangente negativa
@@ -26,14 +29,15 @@ class RenderEngine:
 
         for j in reversed(range(height)):
             for i in reversed(range(width)):
-                u = float(i) / (width-1)
-                v = float(j) / (height-1)
-                ray = camera.get_ray(u, v)
-                color = Color(0,0,0)
-                dist = float('inf')
-                RIndex = 1.0
-                color, dist, RIndex = self.ray_trace(ray, scene, t=dist, aRIndex=RIndex, color=color, depth=0)
-                pixels.set_pixel(i, j, color)
+                for s in range(qtd_samples):
+                    u = (float(i) + random.random())/ (width-1)
+                    v = (float(j) + random.random()) / (height-1)
+                    ray = camera.get_ray(u, v)
+                    color = Color(0,0,0)
+                    dist = float('inf')
+                    RIndex = 1.0
+                    color, dist, RIndex = self.ray_trace(ray, scene, t=dist, aRIndex=RIndex, color=color, depth=0)
+                    pixels.add_pixel(i, j, color)
             print(f"{float(height-j)/float(height) * 100:3.0f}%", end="\r")
         return pixels
     
@@ -69,14 +73,14 @@ class RenderEngine:
                 T = (n * ray.direction) + (n * cosI - math.sqrt(cosT2)) * N
                 r = Ray(hit_pos + T * self.MIN_DISPLACE, T)
                 rcol, t, raRIndex = self.ray_trace(r, scene, depth=depth+1, aRIndex=rindex, t=float('inf'), color=Color(0,0,0))
-                # absorb = self.color_at(obj_hit, hit_pos, hit_normal, scene, ray) * 0.0009 * -dist
+                # absorb = self.color_at(obj_hit, hit_pos, hit_normal, scene, ray) * 0.0009 * -t
                 # transp = Color(
                 #     math.exp(absorb.x), 
                 #     math.exp(absorb.y), 
                 #     math.exp(absorb.z)
                 # )
-                # color += rcolor * transp  
-                # color += rcolor.cross_product(transp)
+                # color += rcol * transp  
+                # color += rcol.cross_product(transp)
                 color += rcol
                 # color += transp  
         return color, t, aRIndex
@@ -100,7 +104,7 @@ class RenderEngine:
         obj_color = material.color_at(hit_pos)
         to_cam = scene.camera.eye - hit_pos
         color = material.ambient * Color.from_hex("#000000")
-        specular_k = 50
+        specular_k = 1000
 
         # Cálculos de iluminação
         for light in scene.lights:
@@ -153,7 +157,7 @@ class RenderEngine:
                     R = inter_to_light - 2.0 * inter_to_light.dot_product(normal) * normal
                     dot = V.dot_product(R)
                     if (dot > 0):
-                        spec = (dot ** 20) * material.specular
+                        spec = (dot ** specular_k) * material.specular
                         color += (
                             light.color
                             * spec

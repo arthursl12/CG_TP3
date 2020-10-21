@@ -24,11 +24,12 @@ def main():
     camera = Camera(mod.CAMERA, Vector(0,0,0), Vector(0,1,0), 20, aspect_ratio)
     scene = Scene(camera, mod.OBJECTS, mod.LIGHTS, mod.WIDTH, mod.HEIGHT)
     engine = RenderEngine()
-    image = engine.render(scene)
+    qtd_samples = 2
+    image = engine.render(scene, qtd_samples)
 
     os.chdir(os.path.dirname(os.path.abspath(mod.__file__)))
     with open(mod.RENDERED_IMG, "w") as img_file:
-        image.write_ppm(img_file)
+        image.write_ppm(img_file, qtd_samples)
 
 
 

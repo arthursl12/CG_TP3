@@ -11,7 +11,7 @@ WIDTH = 1280
 HEIGHT = 720
 
 RENDERED_IMG = "2balls.ppm"
-CAMERA = Vector(40,3,50)
+CAMERA = Vector(30,1,30)
 OBJECTS = [
     # Plano chão
     Sphere(
