@@ -14,7 +14,7 @@ from vector import Vector
 class RenderEngine:
     """Renderiza os objetos no plano de renderização"""
 
-    MAX_DEPTH = 5
+    MAX_DEPTH = 15
     MIN_DISPLACE = 0.1
 
     def render(self, scene, qtd_samples):
@@ -57,7 +57,7 @@ class RenderEngine:
             new_ray = Ray(new_ray_pos, new_ray_dir)
 
             # Atenuar o raio refletido pelo coeficiente de reflexão
-            rcol, t, raRIndex = self.ray_trace(new_ray, scene, aRIndex=aRIndex, t=t, depth=depth+1, color=color)
+            rcol, rt, raRIndex = self.ray_trace(new_ray, scene, aRIndex=aRIndex, t=float('inf'), depth=depth+1, color=Color(0,0,0))
             color += rcol * obj_hit.material.reflection
             color += obj_hit.material.reflection * obj_hit.material.color_at(hit_pos) * 0.3
 
@@ -72,7 +72,7 @@ class RenderEngine:
             if (cosT2 > 0):
                 T = (n * ray.direction) + (n * cosI - math.sqrt(cosT2)) * N
                 r = Ray(hit_pos + T * self.MIN_DISPLACE, T)
-                rcol, t, raRIndex = self.ray_trace(r, scene, depth=depth+1, aRIndex=rindex, t=float('inf'), color=Color(0,0,0))
+                rcol, rt, raRIndex = self.ray_trace(r, scene, depth=depth+1, aRIndex=rindex, t=float('inf'), color=Color(0,0,0))
                 # absorb = self.color_at(obj_hit, hit_pos, hit_normal, scene, ray) * 0.0009 * -t
                 # transp = Color(
                 #     math.exp(absorb.x), 
@@ -81,7 +81,7 @@ class RenderEngine:
                 # )
                 # color += rcol * transp  
                 # color += rcol.cross_product(transp)
-                color += rcol
+                color += rcol * refr
                 # color += transp  
         return color, t, aRIndex
 
@@ -104,7 +104,7 @@ class RenderEngine:
         obj_color = material.color_at(hit_pos)
         to_cam = scene.camera.eye - hit_pos
         color = material.ambient * Color.from_hex("#000000")
-        specular_k = 1000
+        specular_k = 20
 
         # Cálculos de iluminação
         for light in scene.lights:

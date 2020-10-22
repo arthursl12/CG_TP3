@@ -66,6 +66,14 @@ OBJECTS = [
         ambient=0.9, 
         reflection=0.05, 
         refraction=0.8,
+        refrIndex=1.3)),
+    Sphere(Point(15, 0, 15), 0.6, Material(
+        Color.from_hex("#FFFFFF"),
+        diffuse=0, 
+        specular=0.9, 
+        ambient=0, 
+        reflection=0.05, 
+        refraction=0.8,
         refrIndex=1.3))
 ]
 LIGHTS = [

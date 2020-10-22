@@ -1,7 +1,10 @@
 from vector import Vector
 
 class Color(Vector):
-    """Guarda uma cor como uma tripla RGB. Armazenada como vetor 3D"""
+    """
+    Guarda uma cor como uma tripla RGB. Armazenada como vetor 3D
+    Entre 0 e 1
+    """
     @classmethod
     def from_hex(cls, hexcolor="#000000"):
         x = int(hexcolor[1:3], 16) / 255.0

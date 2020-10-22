@@ -1,18 +1,21 @@
 #!/usr/bin/env python
 """
 """
-from color import Color
-from vector import Vector
-from point import Point
-from sphere import Sphere
-from scene import Scene
-from camera import Camera
-from engine import RenderEngine
-from light import Light
-from material import Material
 import argparse
 import importlib
 import os
+
+from camera import Camera
+from color import Color
+from engine import RenderEngine
+from image import read_ppm
+from light import Light
+from material import Material
+from point import Point
+from scene import Scene
+from sphere import Sphere
+from vector import Vector
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -24,13 +27,20 @@ def main():
     camera = Camera(mod.CAMERA, Vector(0,0,0), Vector(0,1,0), 20, aspect_ratio)
     scene = Scene(camera, mod.OBJECTS, mod.LIGHTS, mod.WIDTH, mod.HEIGHT)
     engine = RenderEngine()
-    qtd_samples = 2
-    image = engine.render(scene, qtd_samples)
+    qtd_samples = 1
+    
+    # Load image
+    with open("2balls.ppm", "r") as img_file:
+        im = read_ppm(img_file)
 
-    os.chdir(os.path.dirname(os.path.abspath(mod.__file__)))
-    with open(mod.RENDERED_IMG, "w") as img_file:
-        image.write_ppm(img_file, qtd_samples)
+    # Raytracing & Render
+    # image = engine.render(scene, qtd_samples)
+    # os.chdir(os.path.dirname(os.path.abspath(mod.__file__)))
+    # with open(mod.RENDERED_IMG, "w") as img_file:
+    #     image.write_ppm(img_file, qtd_samples)
 
+    with open('exit.ppm','w') as out:
+        im.write_ppm(out, 1)
 
 
 if __name__ == "__main__":
