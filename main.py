@@ -30,7 +30,7 @@ def main():
     qtd_samples = 1
     
     # Load image
-    with open("2balls.ppm", "r") as img_file:
+    with open("rainbow1.ppm", "rb") as img_file:
         im = read_ppm(img_file)
 
     # Raytracing & Render
@@ -39,7 +39,7 @@ def main():
     # with open(mod.RENDERED_IMG, "w") as img_file:
     #     image.write_ppm(img_file, qtd_samples)
 
-    with open('exit.ppm','w') as out:
+    with open('exit1.ppm','w') as out:
         im.write_ppm(out, 1)
 
 
