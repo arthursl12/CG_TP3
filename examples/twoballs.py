@@ -36,7 +36,7 @@ OBJECTS = [
     Sphere(Point(7, 0, 0), 0.6, Material(Color.from_hex("#803980"), specular=0.9, reflection=0.2)),
     
     # Bola Verde
-    Sphere(Point(0, 0, 1), 0.6, Material(Color.from_hex("#228b22"))),
+    Sphere(Point(0, 0, 1), 0.6, Material(Color.from_hex("#228b22"), texture="rainbow1.ppm")),
     Sphere(Point(0, 0, 3), 0.6, Material(Color.from_hex("#228b22"))),
     Sphere(Point(0, 0, 7), 0.6, Material(Color.from_hex("#228b22"))),
     
@@ -46,32 +46,6 @@ OBJECTS = [
         diffuse=0.02, 
         specular=0.9, 
         ambient=0.9, 
-        reflection=0.05, 
-        refraction=0.8,
-        refrIndex=1.3)),
-
-    Sphere(Point(1.5, 0, 3), 0.6, Material(
-        Color.from_hex("#FFFFFF"),
-        diffuse=0.02, 
-        specular=0.9, 
-        ambient=0.9, 
-        reflection=0.05, 
-        refraction=0.8,
-        refrIndex=1.3)),
-    
-    Sphere(Point(20, 0, 20), 0.6, Material(
-        Color.from_hex("#FFFFFF"),
-        diffuse=0.02, 
-        specular=0.9, 
-        ambient=0.9, 
-        reflection=0.05, 
-        refraction=0.8,
-        refrIndex=1.3)),
-    Sphere(Point(15, 0, 15), 0.6, Material(
-        Color.from_hex("#FFFFFF"),
-        diffuse=0, 
-        specular=0.9, 
-        ambient=0, 
         reflection=0.05, 
         refraction=0.8,
         refrIndex=1.3))

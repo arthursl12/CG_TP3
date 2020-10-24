@@ -30,8 +30,7 @@ def main():
     qtd_samples = 1
     
     # Load image
-    with open("rainbow1.ppm", "rb") as img_file:
-        im = read_ppm(img_file)
+    im = read_ppm("rainbow1.ppm")
 
     # Raytracing & Render
     # image = engine.render(scene, qtd_samples)
