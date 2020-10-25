@@ -20,7 +20,7 @@ OBJECTS = [
         ChequeredMaterial(
             color1=Color.from_hex("#420500"), 
             color2=Color.from_hex("#e6b87d"),
-            ambient=0.2,
+            ambient=0,
             reflection=0.1,
             specular=0.2,
             diffuse=1
@@ -36,7 +36,7 @@ OBJECTS = [
     Sphere(Point(7, 0, 0), 0.6, Material(Color.from_hex("#803980"), specular=0.9, reflection=0.2)),
     
     # Bola Verde
-    Sphere(Point(0, 0, 1), 0.6, Material(Color.from_hex("#228b22"), texture_file="exit1.ppm", diffuse=0.4, reflection=0, specular=0)) ,
+    Sphere(Point(0, 0, 1), 0.6, Material(Color.from_hex("#228b22"), texture_file="exit1.ppm", diffuse=0.4, reflection=0, specular=0, ambient=0)) ,
     Sphere(Point(0, 0, 3), 0.6, Material(Color.from_hex("#228b22"))),
     Sphere(Point(0, 0, 7), 0.6, Material(Color.from_hex("#228b22"))),
     
@@ -45,15 +45,15 @@ OBJECTS = [
         Color.from_hex("#FFFFFF"),
         diffuse=0.02, 
         specular=0.9, 
-        ambient=0.9, 
+        ambient=0, 
         reflection=0.05, 
         refraction=0.8,
         refrIndex=1.3)),
-    Sphere(Point(0, 6, 0), 6, Material(Color.from_hex("#228b22"), texture_file="exit1.ppm", diffuse=0.5, reflection=0.01, specular=0.2, refraction=0.8, refrIndex=1.3)) ,
+    Sphere(Point(0, 6, 0), 6, Material(Color.from_hex("#228b22"), texture_file="exit1.ppm", diffuse=0.5, reflection=0.01, specular=0.2, refraction=0.8, refrIndex=1.3, ambient=0)) ,
 ]
 LIGHTS = [
     # Light(Point(1.5,.5,-10), Color.from_hex("#FFFFFF")),
-    Light(Point(10, 10, 10), Color.from_hex("#FFFFFF"), attenuation=[2,1,0]),
+    Light(Point(10, 10, 10), Color.from_hex("#1E90FF"), attenuation=[2,1,0]),
     Light(Point(10, 10, -10), Color.from_hex("#FFFFFF"), attenuation=[1,0,1])
     # Light(Point(1.5,.5,-10), Color.from_hex("#FFFFFF"))
 ]

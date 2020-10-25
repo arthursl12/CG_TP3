@@ -102,7 +102,7 @@ class RenderEngine:
         material = obj_hit.material
         obj_color = obj_hit.color_at(hit_pos)
         to_cam = scene.camera.eye - hit_pos
-        color = material.ambient * Color.from_hex("#000000")
+        color = material.ambient * Color.from_hex("#FFFFFF")
         specular_k = 20
 
         # Cálculos de iluminação
