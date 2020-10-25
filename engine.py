@@ -73,16 +73,15 @@ class RenderEngine:
                 T = (n * ray.direction) + (n * cosI - math.sqrt(cosT2)) * N
                 r = Ray(hit_pos + T * self.MIN_DISPLACE, T)
                 rcol, rt, raRIndex = self.ray_trace(r, scene, depth=depth+1, aRIndex=rindex, t=float('inf'), color=Color(0,0,0))
-                # absorb = self.color_at(obj_hit, hit_pos, hit_normal, scene, ray) * 0.0009 * -t
-                # transp = Color(
-                #     math.exp(absorb.x), 
-                #     math.exp(absorb.y), 
-                #     math.exp(absorb.z)
-                # )
-                # color += rcol * transp  
-                # color += rcol.cross_product(transp)
-                color += rcol * refr
-                # color += transp  
+                absorb = self.color_at(obj_hit, hit_pos, hit_normal, scene, ray) * 0.15 * -t
+                transp = Color(
+                    math.exp(absorb.x), 
+                    math.exp(absorb.y), 
+                    math.exp(absorb.z)
+                )
+                rcol = Color(rcol.x, rcol.y, rcol.z)
+                color += (rcol.color_prod(transp) * refr)
+
         return color, t, aRIndex
 
     def find_nearest(self, ray, scene):
