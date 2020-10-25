@@ -1,16 +1,26 @@
 from color import Color
+from vector import Vector
+from image import read_ppm
+
 
 class Texture:
-    def __init__(self, _map, width, height):
+    def __init__(self, _map, width, height, u_vector=Vector(0,0.1,0), v_vector=Vector(0,0,0)):
         self.map = _map
         
-        self.u_scale = width
-        self.r_u_scale = 1.0 / width
-        self.v_scale = height
-        self.r_v_scale = 1.0 / height
+        self.width = width
+        self.height = height
+        
+        self.u_vector = u_vector
+        self.v_vector = v_vector
+
     
-    def get_texel(self, u, v):
-        return map.pixels[v][u]
+    def get_texel(self, point):
+        # print(self.map.pixels[round(v)][round(u)])
+        u = point.dot_product(self.u_vector) * self.width
+        v = point.dot_product(self.v_vector) * self.height
+        v_bound = min(round(v), self.height-1)
+        u_bound = min(round(u), self.width-1)
+        return self.map.pixels[v_bound][u_bound]
         
 
 class Material:
@@ -24,7 +34,7 @@ class Material:
         reflection=0.9,
         refraction=0.0,
         refrIndex=1,
-        texture=None
+        texture_file=None
     ):
         self.color = color
         self.ambient = ambient
@@ -33,16 +43,16 @@ class Material:
         self.reflection = reflection
         self.refraction = refraction
         self.refrIndex = refrIndex
-        
-        # with open(texture, "rb") as img_file:
-        #     im = read_ppm(img_file)
-        self.texture = texture
-    
+        if (texture_file is not None):
+            tex_map = read_ppm(texture_file)
+            self.texture = Texture(tex_map, tex_map.width, tex_map.height)
+        else:
+            self.texture = None
     def color_at(self, position):
         return self.color
 
-    def get_texel(self, u, v):
-        return texture.get_texel(u,v)
+    def get_texel(self, point):
+        return self.texture.get_texel(point)
             
     
 
@@ -66,6 +76,7 @@ class ChequeredMaterial:
         self.reflection = reflection
         self.refraction = refraction
         self.refrIndex = refrIndex
+        self.texture = None
     
     def color_at(self, position):
         if (int((position.x + 5.0) * 3) % 2 == int((position.z * 3) % 2)):

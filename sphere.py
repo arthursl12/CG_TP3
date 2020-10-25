@@ -1,6 +1,7 @@
-from math import sqrt
-
+from math import sqrt, acos, pi, sin
+from color import Color
 from enum import Enum
+from vector import Vector
 class Hit(Enum):
     MISS = 0
     INSIDE = -1
@@ -38,3 +39,10 @@ class Sphere:
     def normal(self, surface_point):
         """Retorna a normal no ponto da superfície da esfera"""
         return (surface_point - self.center).normalize()
+    
+    def color_at(self, surf_point):
+        if (self.material.texture is None):
+            return self.material.color_at(surf_point)
+        else:
+            c = self.material.get_texel(surf_point)
+            return c

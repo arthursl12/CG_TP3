@@ -11,3 +11,9 @@ class Color(Vector):
         y = int(hexcolor[3:5], 16) / 255.0
         z = int(hexcolor[5:7], 16) / 255.0
         return cls(x, y, z)
+
+    def color_prod(self, other):
+        r = self.x * other.x
+        g = self.y * other.y
+        b = self.z * other.z
+        return Color(r,g,b)

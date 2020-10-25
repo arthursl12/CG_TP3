@@ -11,7 +11,7 @@ WIDTH = 1280
 HEIGHT = 720
 
 RENDERED_IMG = "2balls.ppm"
-CAMERA = Vector(30,1,30)
+CAMERA = Vector(20,40,20)
 OBJECTS = [
     # Plano chão
     Sphere(
@@ -36,7 +36,7 @@ OBJECTS = [
     Sphere(Point(7, 0, 0), 0.6, Material(Color.from_hex("#803980"), specular=0.9, reflection=0.2)),
     
     # Bola Verde
-    Sphere(Point(0, 0, 1), 0.6, Material(Color.from_hex("#228b22"), texture="rainbow1.ppm")),
+    Sphere(Point(0, 0, 1), 0.6, Material(Color.from_hex("#228b22"), texture_file="exit1.ppm", diffuse=0.4, reflection=0, specular=0)) ,
     Sphere(Point(0, 0, 3), 0.6, Material(Color.from_hex("#228b22"))),
     Sphere(Point(0, 0, 7), 0.6, Material(Color.from_hex("#228b22"))),
     
@@ -48,7 +48,8 @@ OBJECTS = [
         ambient=0.9, 
         reflection=0.05, 
         refraction=0.8,
-        refrIndex=1.3))
+        refrIndex=1.3)),
+    Sphere(Point(0, 6, 0), 6, Material(Color.from_hex("#228b22"), texture_file="exit1.ppm", diffuse=0.5, reflection=0.01, specular=0.2, refraction=0.8, refrIndex=1.3)) ,
 ]
 LIGHTS = [
     # Light(Point(1.5,.5,-10), Color.from_hex("#FFFFFF")),

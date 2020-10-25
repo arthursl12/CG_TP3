@@ -28,18 +28,12 @@ def main():
     scene = Scene(camera, mod.OBJECTS, mod.LIGHTS, mod.WIDTH, mod.HEIGHT)
     engine = RenderEngine()
     qtd_samples = 1
-    
-    # Load image
-    im = read_ppm("rainbow1.ppm")
 
     # Raytracing & Render
-    # image = engine.render(scene, qtd_samples)
-    # os.chdir(os.path.dirname(os.path.abspath(mod.__file__)))
-    # with open(mod.RENDERED_IMG, "w") as img_file:
-    #     image.write_ppm(img_file, qtd_samples)
-
-    with open('exit1.ppm','w') as out:
-        im.write_ppm(out, 1)
+    image = engine.render(scene, qtd_samples)
+    os.chdir(os.path.dirname(os.path.abspath(mod.__file__)))
+    with open(mod.RENDERED_IMG, "w") as img_file:
+        image.write_ppm(img_file, qtd_samples)
 
 
 if __name__ == "__main__":

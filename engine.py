@@ -101,7 +101,7 @@ class RenderEngine:
     
     def color_at(self, obj_hit, hit_pos, normal, scene, ray):
         material = obj_hit.material
-        obj_color = material.color_at(hit_pos)
+        obj_color = obj_hit.color_at(hit_pos)
         to_cam = scene.camera.eye - hit_pos
         color = material.ambient * Color.from_hex("#000000")
         specular_k = 20
@@ -134,13 +134,8 @@ class RenderEngine:
                     )
                     color += (
                         diffuse_coeff
-                        * obj_color
+                        * obj_color.color_prod(light.color)
                     )
-                    # color += (
-                    #     diffuse_coeff
-                    #     * light.color
-                    #     * 0.1
-                    # )
                 
                 
                 
