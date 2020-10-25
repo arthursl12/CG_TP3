@@ -126,10 +126,13 @@ class RenderEngine:
                 inter_to_light = (light.position - hit_pos).normalize()
                 # Difusa
                 if (material.diffuse > 0):
+                    light_dist = inter_to_light.magnitude()
+                    light_attenuation = light.get_attenuation(light_dist)
                     diffuse_coeff = (
                         max(normal.dot_product(inter_to_light),0) 
                         * material.diffuse
                         * shade
+                        * light_attenuation
                     )
                     color += (
                         diffuse_coeff

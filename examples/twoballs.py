@@ -53,7 +53,7 @@ OBJECTS = [
 ]
 LIGHTS = [
     # Light(Point(1.5,.5,-10), Color.from_hex("#FFFFFF")),
-    Light(Point(10, 10, 10), Color.from_hex("#FFFFFF")),
-    Light(Point(10, 10, -10), Color.from_hex("#FFFFFF"))
+    Light(Point(10, 10, 10), Color.from_hex("#FFFFFF"), attenuation=[2,1,0]),
+    Light(Point(10, 10, -10), Color.from_hex("#FFFFFF"), attenuation=[1,0,1])
     # Light(Point(1.5,.5,-10), Color.from_hex("#FFFFFF"))
 ]
