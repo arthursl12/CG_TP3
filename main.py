@@ -18,12 +18,39 @@ from vector import Vector
 
 
 def main():
+    # Parse dos argumentos
     parser = argparse.ArgumentParser()
-    parser.add_argument("scene", help="Caminho para cena")
+    parser.add_argument("arquivo_entrada", help="Nome arquivo entrada")
+    parser.add_argument("arquivo_saida", help="Nome arquivo saida")
+    parser.add_argument(
+        "-t",
+        "--tamanho",
+        action="store",
+        nargs="+",
+        type=int,
+        dest="tamanho",
+        help="(Opcional) Tamanho (largura x altura) da imagem de saída (padrão=800x600)",
+        default=[800,600]
+    )
     args = parser.parse_args()
-    mod = importlib.import_module(args.scene)
+    print(args.arquivo_entrada)
+    print(args.arquivo_saida)
+    print(args.tamanho)
+    return
+    width = args.tamanho[0]
+    height = args.tamanho[1]
 
-    aspect_ratio = float(mod.WIDTH) / mod.HEIGHT
+
+
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument("scene", help="Caminho para cena")
+    # args = parser.parse_args()
+    # mod = importlib.import_module(args.scene)
+
+
+    return
+
+    aspect_ratio = float(width) / height
     camera = Camera(mod.CAMERA, Vector(0,0,0), Vector(0,1,0), 20, aspect_ratio)
     scene = Scene(camera, mod.OBJECTS, mod.LIGHTS, mod.WIDTH, mod.HEIGHT)
     engine = RenderEngine()
