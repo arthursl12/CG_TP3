@@ -14,7 +14,7 @@ from material import Material
 from point import Point
 from scene import Scene
 from sphere import Sphere
-from vector import Vector
+from vector import Vector, from_string
 
 
 def main():
@@ -39,17 +39,19 @@ def main():
     width = args.tamanho[0]
     height = args.tamanho[1]
     
+    
+    aspect_ratio = float(width) / height
+    # Leitura do arquivo de entrada
     # Assumindo que não há comentários
     with open(args.arquivo_entrada) as in_file:
-        cam_pos = in_file.readline()
-        look_at = in_file.readline()
-        up = in_file.readline()
-        fov = in_file.readline()
+        cam_pos = from_string(in_file.readline())
+        look_at = from_string(in_file.readline())
+        up = from_string(in_file.readline())
+        fov = float(in_file.readline())
+        
             
-            
-    return
 
-
+    camera = Camera(cam_pos, look_at, up, fov, aspect_ratio)
     # parser = argparse.ArgumentParser()
     # parser.add_argument("scene", help="Caminho para cena")
     # args = parser.parse_args()
