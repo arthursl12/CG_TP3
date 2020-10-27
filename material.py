@@ -4,11 +4,11 @@ from image import read_ppm
 
 
 class Texture:
-    def __init__(self, _map, width, height, u_vector=Vector(0,0.1,0), v_vector=Vector(0,0,0)):
-        self.map = _map
+    def __init__(self, texture_file, u_vector=Vector(0,0.1,0), v_vector=Vector(0,0,0)):
+        self.map = read_ppm(texture_file)
         
-        self.width = width
-        self.height = height
+        self.width = self.map.width
+        self.height = self.map.height
         
         self.u_vector = u_vector
         self.v_vector = v_vector
@@ -34,7 +34,7 @@ class Material:
         reflection=0.9,
         refraction=0.0,
         refrIndex=1,
-        texture_file=None
+        texture=None
     ):
         self.color = color
         self.ambient = ambient
@@ -43,11 +43,7 @@ class Material:
         self.reflection = reflection
         self.refraction = refraction
         self.refrIndex = refrIndex
-        if (texture_file is not None):
-            tex_map = read_ppm(texture_file)
-            self.texture = Texture(tex_map, tex_map.width, tex_map.height)
-        else:
-            self.texture = None
+        self.texture = texture
     def color_at(self, position):
         return self.color
 

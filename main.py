@@ -10,7 +10,7 @@ from color import Color
 from engine import RenderEngine
 from image import read_ppm
 from light import Light
-from material import Material
+from material import Material, ChequeredMaterial, Texture
 from point import Point
 from scene import Scene
 from sphere import Sphere
@@ -61,6 +61,49 @@ def main():
             lgt_att = [att.x, att.y, att.z]
             lights.append(Light(lgt_pos, lgt_color, lgt_att))
         
+        # Materiais
+        # Pigmentos
+        pigms = []
+        qtd_pigms = int(in_file.readline())
+        for i in range(qtd_pigms):
+            pigm = list_from_string(in_file.readline())
+            if (pigm[0] == "texmap"):
+                text_file = pigm[1]
+                p0 = list_from_string(in_file.readline())
+                p0 = Vector(float(p0[0]), float(p0[1]), float(p0[2]))
+                p1 = list_from_string(in_file.readline())
+                p1 = Vector(float(p1[0]), float(p1[1]), float(p1[2]))
+                text = Texture(text_file, u_vector=p0, v_vector=p1)
+                texture_mat = Material(texture=text)
+                pigms.append(texture_mat)
+            elif (pigm[0] == "checker"):
+                cor1 = Color(
+                    float(pigm[1]), 
+                    float(pigm[2]),
+                    float(pigm[3])
+                )
+                cor2 = Color(
+                    float(pigm[4]), 
+                    float(pigm[5]),
+                    float(pigm[6])
+                )
+                tam = float(pigm[7])
+                ## TODO: implementar tamanho no xadrez
+                check = ChequeredMaterial(color1=cor1, color2=cor2)
+                pigms.append(check)
+            elif (pigm[0] == "solid"):
+                color = Color(
+                    float(pigm[1]), 
+                    float(pigm[2]),
+                    float(pigm[3])
+                )
+                solid = Material(color=color)
+                pigms.append(solid)
+        
+        # Acabamentos
+        acabs = []
+        qtd_acabs = int(in_file.readline())
+
         
             
 
