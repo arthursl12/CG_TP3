@@ -56,10 +56,17 @@ def main():
         for i in range(qtd_lights):
             lgt = list_from_string(in_file.readline())
             lgt_pos = vector_from_list(lgt[0:3])
-            lgt_color = Color(vector_from_list((lgt[3:6])))
+            color_vec = vector_from_list((lgt[3:6]))
+            lgt_color = Color(
+                color_vec.x,
+                color_vec.y,
+                color_vec.z
+            )
             att = vector_from_list(lgt[6:9])
             lgt_att = [att.x, att.y, att.z]
-            lights.append(Light(lgt_pos, lgt_color, lgt_att))
+            lights.append(Light(position=lgt_pos))
+                
+            # Light(lgt_pos, lgt_color, lgt_att))
         
         # Materiais
         # Pigmentos
@@ -103,29 +110,46 @@ def main():
         # Acabamentos
         acabs = []
         qtd_acabs = int(in_file.readline())
-
+        for i in range(qtd_acabs):
+            acab_list = list_from_string(in_file.readline())
+            assert len(acab_list) == 7
+            for j in range(len(acab_list)):
+                acab_list[j] = float(acab_list[j])
+            acabs.append(acab_list)
         
-            
+        # Objetos
+        objects = []
+        qtd_objs = int(in_file.readline())
+        for i in range(qtd_objs):
+            obj_descr = list_from_string(in_file.readline())
+            if (obj_descr[2] == "sphere"):
+                mat = int(obj_descr[0])
+                acab = int(obj_descr[1])
+                centro = Vector(
+                    float(obj_descr[3]), 
+                    float(obj_descr[4]), 
+                    float(obj_descr[5])
+                )
+                raio = float(obj_descr[6])
+                esfera = Sphere(centro, raio, Material(color=Color.from_hex("#000000")))
+                objects.append(esfera)
+            elif (obj_descr[2] == "polyhedron"):
+                mat = int(obj_descr[0])
+                acab = int(obj_descr[1])
+                qtd_faces = int(obj_descr[3])
+                for j in range(qtd_faces):
+                    face_descr = list_from_string(in_file.readline())
+                    # TODO: processar a face
 
+    # Montagem da cena
     camera = Camera(cam_pos, look_at, up, fov, aspect_ratio)
-    for light in lights:
-        print(light.position)
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument("scene", help="Caminho para cena")
-    # args = parser.parse_args()
-    # mod = importlib.import_module(args.scene)
-
-
-    return
-
-    scene = Scene(camera, mod.OBJECTS, mod.LIGHTS, mod.WIDTH, mod.HEIGHT)
+    scene = Scene(camera, objects, lights, width, height)
     engine = RenderEngine()
     qtd_samples = 1
 
     # Raytracing & Render
     image = engine.render(scene, qtd_samples)
-    os.chdir(os.path.dirname(os.path.abspath(mod.__file__)))
-    with open(mod.RENDERED_IMG, "w") as img_file:
+    with open(args.arquivo_saida, "w") as img_file:
         image.write_ppm(img_file, qtd_samples)
 
 
