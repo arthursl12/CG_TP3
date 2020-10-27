@@ -36,10 +36,18 @@ def main():
     print(args.arquivo_entrada)
     print(args.arquivo_saida)
     print(args.tamanho)
-    return
     width = args.tamanho[0]
     height = args.tamanho[1]
-
+    
+    # Assumindo que não há comentários
+    with open(args.arquivo_entrada) as in_file:
+        cam_pos = in_file.readline()
+        look_at = in_file.readline()
+        up = in_file.readline()
+        fov = in_file.readline()
+            
+            
+    return
 
 
     # parser = argparse.ArgumentParser()

@@ -45,3 +45,14 @@ class Vector:
     
     def __eq__(self, other):
         return (self.x == other.x) and (self.y == other.y) and (self.z == other.z)
+
+def from_string(string):
+    """
+    Dada uma string com três valores separados por espaço(s), retorna o vetor
+    3D correspondente
+    """
+    coord_list = ' '.join(string.split())   # Elimina espaços consecutivos 
+    coord_list = coord_list.split(' ')      # Separa por espaços
+    assert len(coord_list) == 3
+    return Vector(float(coord_list[0]), float(coord_list[1]), float(coord_list[2]))
+    
