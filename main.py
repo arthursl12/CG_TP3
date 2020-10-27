@@ -14,7 +14,7 @@ from material import Material
 from point import Point
 from scene import Scene
 from sphere import Sphere
-from vector import Vector, from_string
+from vector import Vector, vector_from_string, list_from_string, vector_from_list
 
 
 def main():
@@ -44,14 +44,29 @@ def main():
     # Leitura do arquivo de entrada
     # Assumindo que não há comentários
     with open(args.arquivo_entrada) as in_file:
-        cam_pos = from_string(in_file.readline())
-        look_at = from_string(in_file.readline())
-        up = from_string(in_file.readline())
+        # Câmera
+        cam_pos = vector_from_string(in_file.readline())
+        look_at = vector_from_string(in_file.readline())
+        up = vector_from_string(in_file.readline())
         fov = float(in_file.readline())
+        
+        # Luzes
+        lights = []
+        qtd_lights = int(in_file.readline())
+        for i in range(qtd_lights):
+            lgt = list_from_string(in_file.readline())
+            lgt_pos = vector_from_list(lgt[0:3])
+            lgt_color = Color(vector_from_list((lgt[3:6])))
+            att = vector_from_list(lgt[6:9])
+            lgt_att = [att.x, att.y, att.z]
+            lights.append(Light(lgt_pos, lgt_color, lgt_att))
+        
         
             
 
     camera = Camera(cam_pos, look_at, up, fov, aspect_ratio)
+    for light in lights:
+        print(light.position)
     # parser = argparse.ArgumentParser()
     # parser.add_argument("scene", help="Caminho para cena")
     # args = parser.parse_args()
@@ -60,8 +75,6 @@ def main():
 
     return
 
-    aspect_ratio = float(width) / height
-    camera = Camera(mod.CAMERA, Vector(0,0,0), Vector(0,1,0), 20, aspect_ratio)
     scene = Scene(camera, mod.OBJECTS, mod.LIGHTS, mod.WIDTH, mod.HEIGHT)
     engine = RenderEngine()
     qtd_samples = 1
