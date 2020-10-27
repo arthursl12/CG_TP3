@@ -2,6 +2,7 @@
 """
 """
 import argparse
+import copy
 import importlib
 import os
 
@@ -10,11 +11,12 @@ from color import Color
 from engine import RenderEngine
 from image import read_ppm
 from light import Light
-from material import Material, ChequeredMaterial, Texture
+from material import ChequeredMaterial, Material, Texture
 from point import Point
 from scene import Scene
 from sphere import Sphere
-from vector import Vector, vector_from_string, list_from_string, vector_from_list
+from vector import (Vector, list_from_string, vector_from_list,
+                    vector_from_string)
 
 
 def main():
@@ -131,7 +133,18 @@ def main():
                     float(obj_descr[5])
                 )
                 raio = float(obj_descr[6])
-                esfera = Sphere(centro, raio, Material(color=Color.from_hex("#000000")))
+                new_material = copy.deepcopy(pigms[mat])
+                new_acab = copy.deepcopy(acabs[acab])
+                new_material.set_acabamento(
+                    new_acab[0],
+                    new_acab[1],
+                    new_acab[2],
+                    new_acab[3],
+                    new_acab[4],
+                    new_acab[5],
+                    new_acab[6]
+                )
+                esfera = Sphere(centro, raio, new_material)
                 objects.append(esfera)
             elif (obj_descr[2] == "polyhedron"):
                 mat = int(obj_descr[0])

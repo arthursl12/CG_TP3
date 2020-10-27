@@ -30,25 +30,50 @@ class Material:
         color=Color.from_hex("#FFFFFF"), 
         ambient=0.0005, 
         diffuse=1.0, 
-        specular=1.0, 
+        specular=1.0,
+        exp_specular=20,
         reflection=0.9,
         refraction=0.0,
         refrIndex=1,
+        ior=0,
         texture=None
     ):
         self.color = color
-        self.ambient = ambient
-        self.diffuse = diffuse
-        self.specular = specular
-        self.reflection = reflection
-        self.refraction = refraction
-        self.refrIndex = refrIndex
+        self.ambient = ambient              # ka
+        self.diffuse = diffuse              # kd
+        self.specular = specular            # ks
+        self.exp_specular = exp_specular    # alpha
+
+        self.reflection = reflection        # kr
+        self.refraction = refraction        # kt
+        self.refrIndex = refrIndex          
+        self.ior = ior                      # ior
         self.texture = texture
+
     def color_at(self, position):
         return self.color
 
     def get_texel(self, point):
         return self.texture.get_texel(point)
+
+    def set_acabamento(self, ka, kd, ks, alpha, kr, kt, ior):
+        """
+        Parâmetros:
+        ka      - coeficiente de luz ambiente
+        kd      - coeficiente de luz difusa
+        ks      - coeficiente de luz especular
+        alpha   - expoente da reflexão especular
+        kr      - coeficiente de reflexão
+        kt      - coeficiente de transmissão (refração)
+        ior     - taxa entre índices de refração ambiente e material (n1/n2)
+        """
+        self.ambient = ka
+        self.diffuse = kd
+        self.specular = ks
+        self.exp_specular = alpha
+        self.reflection = kr
+        self.refraction = kt
+        self.ior = ior
             
     
 
