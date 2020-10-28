@@ -117,7 +117,7 @@ class RenderEngine:
             shade = 1.0
             
             # Sombras pontuais
-            if (light.type == LightType.POINT):
+            if (light.type == LightType.POINT and light.ambient == False):
                 L = light.position - hit_pos
                 dist = L.magnitude()
                 L *= 1.0 / dist

@@ -6,11 +6,12 @@ class LightType(Enum):
 
 class Light:
     """Luz pontual com uma cor determinada"""
-    def __init__(self, position, color=Color.from_hex("#FFFFFF"), attenuation=[1,0,0]):
+    def __init__(self, position, color=Color.from_hex("#FFFFFF"), attenuation=[1,0,0], ambient=False):
         self.position = position
         self.color = color
         self.type = LightType.POINT
         self.attenuation = attenuation
+        self.ambient = ambient
     
     def get_attenuation(self, dist):
         fator  = self.attenuation[0]
