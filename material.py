@@ -16,8 +16,8 @@ class Texture:
     
     def get_texel(self, point):
         # print(self.map.pixels[round(v)][round(u)])
-        u = abs(point.dot_product(self.u_vector)) * 1000
-        v = abs(point.dot_product(self.v_vector)) * 2000
+        u = abs(point.dot_product(self.u_vector)) * self.width
+        v = abs(point.dot_product(self.v_vector)) * self.height
         v_bound = min(round(v), self.height-1)
         u_bound = min(round(u), self.width-1)
         return self.map.pixels[v_bound][u_bound]

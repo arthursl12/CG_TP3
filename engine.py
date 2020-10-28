@@ -14,7 +14,7 @@ from vector import Vector
 class RenderEngine:
     """Renderiza os objetos no plano de renderização"""
 
-    MAX_DEPTH = 15
+    MAX_DEPTH = 10
     MIN_DISPLACE = 0.1
 
     def render(self, scene, qtd_samples):
@@ -47,11 +47,11 @@ class RenderEngine:
         if obj_hit is None:
             return color, t, aRIndex
         hit_pos = ray.origin + ray.direction * t
-        # if case == Hit.INSIDE:
-        #     inside = True
-        # else:
-        #     inside = False
-        hit_normal = obj_hit.normal(hit_pos, False)
+        if (case == Hit.INSIDE):
+            inside = True
+        else:
+            inside = False
+        hit_normal = obj_hit.normal(hit_pos, inside)
         color += self.color_at(obj_hit, hit_pos, hit_normal, scene, ray)
 
         # Cálculo da Reflexão
@@ -72,7 +72,8 @@ class RenderEngine:
             # n = aRIndex / rindex
             n = obj_hit.material.ior
             rindex = aRIndex / obj_hit.material.ior
-            N = hit_normal * (float)(case.value)      # Normal depende se é interna ou externa
+            
+            N = hit_normal      # Normal depende se é interna ou externa
             cosI  = -(N.dot_product(ray.direction))
             cosT2 = 1.0 - n * n * (1.0 - cosI * cosI)
             if (cosT2 > 0):
