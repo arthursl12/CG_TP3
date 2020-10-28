@@ -47,7 +47,11 @@ class RenderEngine:
         if obj_hit is None:
             return color, t, aRIndex
         hit_pos = ray.origin + ray.direction * t
-        hit_normal = obj_hit.normal(hit_pos)
+        # if case == Hit.INSIDE:
+        #     inside = True
+        # else:
+        #     inside = False
+        hit_normal = obj_hit.normal(hit_pos, False)
         color += self.color_at(obj_hit, hit_pos, hit_normal, scene, ray)
 
         # Cálculo da Reflexão
@@ -64,8 +68,10 @@ class RenderEngine:
         # Cálculo da Refração
         if (depth < self.MAX_DEPTH and obj_hit.material.refraction > 0):
             refr = obj_hit.material.refraction
-            rindex = obj_hit.material.refrIndex
-            n = aRIndex / rindex
+            # rindex = obj_hit.material.refrIndex
+            # n = aRIndex / rindex
+            n = obj_hit.material.ior
+            rindex = aRIndex / obj_hit.material.ior
             N = hit_normal * (float)(case.value)      # Normal depende se é interna ou externa
             cosI  = -(N.dot_product(ray.direction))
             cosT2 = 1.0 - n * n * (1.0 - cosI * cosI)

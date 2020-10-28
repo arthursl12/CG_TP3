@@ -36,13 +36,16 @@ class Sphere:
                         return x1, Hit.HIT
         return dist, Hit.MISS
     
-    def normal(self, surface_point):
+    def normal(self, surface_point, inside):
         """Retorna a normal no ponto da superfície da esfera"""
-        return (surface_point - self.center).normalize()
+        if (inside == False):
+            return (surface_point - self.center).normalize()
+        else:
+            return (self.center - surface_point).normalize()
     
     def color_at(self, surf_point):
         if (self.material.texture is None):
             return self.material.color_at(surf_point)
-        else:
+        else:     
             c = self.material.get_texel(surf_point)
             return c

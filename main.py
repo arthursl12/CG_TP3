@@ -66,9 +66,7 @@ def main():
             )
             att = vector_from_list(lgt[6:9])
             lgt_att = [att.x, att.y, att.z]
-            lights.append(Light(position=lgt_pos))
-                
-            # Light(lgt_pos, lgt_color, lgt_att))
+            lights.append(Light(lgt_pos, lgt_color, lgt_att))
         
         # Materiais
         # Pigmentos
@@ -83,7 +81,7 @@ def main():
                 p1 = list_from_string(in_file.readline())
                 p1 = Vector(float(p1[0]), float(p1[1]), float(p1[2]))
                 text = Texture(text_file, u_vector=p0, v_vector=p1)
-                texture_mat = Material(texture=text)
+                texture_mat = Material(color=Color.from_hex("#F00000"), texture=text)
                 pigms.append(texture_mat)
             elif (pigm[0] == "checker"):
                 cor1 = Color(
@@ -144,6 +142,7 @@ def main():
                     new_acab[5],
                     new_acab[6]
                 )
+                # new_material.color = Color.from_hex("#FFF3F3")
                 esfera = Sphere(centro, raio, new_material)
                 objects.append(esfera)
             elif (obj_descr[2] == "polyhedron"):
