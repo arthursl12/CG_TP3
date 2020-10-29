@@ -71,24 +71,36 @@ class RenderEngine:
             refr = obj_hit.material.refraction
             # rindex = obj_hit.material.refrIndex
             # n = aRIndex / rindex
-            n = obj_hit.material.ior
-            rindex = aRIndex / obj_hit.material.ior
-            
-            N = hit_normal      # Normal depende se é interna ou externa
-            cosI  = -(N.dot_product(ray.direction))
-            cosT2 = 1.0 - n * n * (1.0 - cosI * cosI)
-            if (cosT2 > 0):
-                T = (n * ray.direction) + (n * cosI - math.sqrt(cosT2)) * N
-                r = Ray(hit_pos + T * self.MIN_DISPLACE, T)
-                rcol, rt, raRIndex = self.ray_trace(r, scene, depth=depth+1, aRIndex=rindex, t=float('inf'), color=Color(0,0,0))
-                absorb = self.color_at(obj_hit, hit_pos, hit_normal, scene, ray) * 0.15 * -t
-                transp = Color(
-                    math.exp(absorb.x), 
-                    math.exp(absorb.y), 
-                    math.exp(absorb.z)
-                )
-                rcol = Color(rcol.x, rcol.y, rcol.z)
-                color += (rcol.color_prod(transp) * refr)
+            # rindex = obj_hit.material.ior
+            # rindex = aRIndex / obj_hit.material.ior
+            if (case == Hit.INSIDE):
+                refr_ratio = obj_hit.material.ior
+            else:
+                refr_ratio = 1.0 / obj_hit.material.ior
+            unit_direction = (ray.direction).normalize()
+            N = hit_normal  
+            cos_theta = ((-1) * unit_direction).dot_product(N)
+            r_out_perp = refr_ratio * (unit_direction + cos_theta * N)
+            magn = (r_out_perp.magnitude()) ** 2
+            r_out_parallel = - math.sqrt(abs(1.0 - magn)) * N
+            refr_direction = r_out_perp + r_out_parallel
+            # N = hit_normal      # Normal depende se é interna ou externa
+            # cosI  = -(N.dot_product(ray.direction))
+            # cosT2 = 1.0 - n * n * (1.0 - cosI * cosI)
+            # if (cosT2 > 0):
+            #     T = (n * ray.direction) + (n * cosI - math.sqrt(cosT2)) * N
+            #     r = Ray(hit_pos + T * self.MIN_DISPLACE, T)
+            #     rcol, rt, raRIndex = self.ray_trace(r, scene, depth=depth+1, aRIndex=rindex, t=float('inf'), color=Color(0,0,0))
+            #     absorb = self.color_at(obj_hit, hit_pos, hit_normal, scene, ray) * 0.15 * -t
+            #     transp = Color(
+            #         math.exp(absorb.x), 
+            #         math.exp(absorb.y), 
+            #         math.exp(absorb.z)
+            #     )
+            r = Ray(hit_pos - N * self.MIN_DISPLACE, refr_direction)
+            rcol, rt, raRIndex = self.ray_trace(r, scene, depth=depth+1, aRIndex=aRIndex, t=float('inf'), color=Color(0,0,0))
+            rcol = Color(rcol.x, rcol.y, rcol.z)
+            color += rcol * refr
 
         return color, t, aRIndex
 

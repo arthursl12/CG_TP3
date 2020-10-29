@@ -23,7 +23,7 @@ solid 1 1 1
 0 0 sphere 0 0 0 600
 0 0 sphere -500 0 1900 600
 3 4 sphere 0 32.7 0 20
-2 3 sphere -5.98 0 -22.31 20
+3 3 sphere -5.98 0 -22.31 20
 2 3 sphere -16.32 0 16.32 20
 1 1 polyhedron 5
 0 1 0 60
