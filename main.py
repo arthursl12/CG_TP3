@@ -13,6 +13,7 @@ from image import read_ppm
 from light import Light
 from material import ChequeredMaterial, Material, Texture
 from point import Point
+from polyhedron import Polyhedron
 from scene import Scene
 from sphere import Sphere
 from vector import (Vector, list_from_string, vector_from_list,
@@ -72,6 +73,7 @@ def main():
                 primeira = False
             else:
                 lights.append(Light(lgt_pos, lgt_color, lgt_att, ambient=True))
+        
         # Materiais
         # Pigmentos
         pigms = []
@@ -153,9 +155,31 @@ def main():
                 mat = int(obj_descr[0])
                 acab = int(obj_descr[1])
                 qtd_faces = int(obj_descr[3])
+                
+                planos = []
                 for j in range(qtd_faces):
                     face_descr = list_from_string(in_file.readline())
-                    # TODO: processar a face
+                    assert len(face_descr) == 4
+                    planos.append([
+                        float(face_descr[0]),
+                        float(face_descr[1]),
+                        float(face_descr[2]),
+                        -float(face_descr[3]),
+                    ])
+                new_material = copy.deepcopy(pigms[mat])
+                new_acab = copy.deepcopy(acabs[acab])
+                new_material.set_acabamento(
+                    new_acab[0],
+                    new_acab[1],
+                    new_acab[2],
+                    new_acab[3],
+                    new_acab[4],
+                    new_acab[5],
+                    new_acab[6]
+                )
+                poly = Polyhedron(planos, new_material)
+                objects.append(poly)
+                
 
     # Montagem da cena
     camera = Camera(cam_pos, look_at, up, fov, aspect_ratio)

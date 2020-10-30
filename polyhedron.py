@@ -44,38 +44,41 @@ class Polyhedron:
                     + point.z * plane[2]
                 )
                 rhs = plane[3]
-                if (lhs < rhs):
+                if ((lhs < rhs) and (t in inters)):
                     # Ponto fora da região
                     inters.remove(t)
+
                     
         if (len(inters) == 0):
             # Todos os pontos de interseção encontrados estão fora da região
-            return float('inf'), Hit.MISS
+            return dist, Hit.MISS
         
         # Define se foi um hit dentro ou fora
         inters.sort()
         t_result = inters[0]
-         
-        # Acha o plano de interseção
-        point = ray.origin + t_result * ray.direction
-        for plane in self.planos:
-            lhs = (
-                point.x * plane[0]
-                + point.y * plane[1]
-                + point.z * plane[2]
-            )
-            rhs = plane[3]
-            if (abs(lhs-rhs) < 0.001):
-                plano_inters = plane
-                break
-        
-        Np = (Vector(plano_inters[0], plano_inters[1], plano_inters[2])).normalize()
-        R = ((-1)*ray.direction).normalize()
-        cos = Np.dot_product(R)
-        if (cos > 0):
-            return t_result, Hit.INSIDE
+        if (t_result < dist):
+            # Acha o plano de interseção
+            point = ray.origin + t_result * ray.direction
+            for plane in self.planos:
+                lhs = (
+                    point.x * plane[0]
+                    + point.y * plane[1]
+                    + point.z * plane[2]
+                )
+                rhs = plane[3]
+                if (abs(lhs-rhs) < 0.001):
+                    plano_inters = plane
+                    break
+            
+            Np = (Vector(plano_inters[0], plano_inters[1], plano_inters[2])).normalize()
+            R = (ray.origin - point).normalize()
+            cos = Np.dot_product(R)
+            if (cos >= 0):
+                return t_result, Hit.INSIDE
+            else:
+                return t_result, Hit.HIT
         else:
-            return t_result, Hit.HIT
+            return dist, Hit.MISS
             
     def normal(self, surface_point, inside):
         # Acha o plano de interseção
@@ -99,7 +102,7 @@ class Polyhedron:
             return (-1) * N_dentro
         
     def color_at(self, surf_point):
-        pass
+        return self.material.color_at(surf_point)
 
 if __name__ == "__main__":
     from material import Material

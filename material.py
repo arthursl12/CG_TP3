@@ -87,7 +87,8 @@ class ChequeredMaterial:
         specular=1.0, 
         reflection=0.5,
         refraction=0.0,
-        refrIndex=1
+        refrIndex=1,
+        exp_specular=20
     ):
         self.color1 = color1
         self.color2 = color2
@@ -97,6 +98,7 @@ class ChequeredMaterial:
         self.reflection = reflection
         self.refraction = refraction
         self.refrIndex = refrIndex
+        self.exp_specular = exp_specular
         self.texture = None
     
     def color_at(self, position):
