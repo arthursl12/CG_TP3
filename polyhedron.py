@@ -148,7 +148,27 @@ class Polyhedron:
             return (-1) * N_dentro
         
     def color_at(self, surf_point):
-        return self.material.color_at(surf_point)
+        # Acha o plano de interseção
+        point = surf_point
+        for plane in self.planos:
+            eqn = plane.equacao
+            res = (
+                point.x * eqn[0]
+                + point.y * eqn[1]
+                + point.z * eqn[2]
+                + eqn[3]
+            )
+            if (abs(res) < 0.001):
+                plano_inters = plane
+                break
+            
+        assert (plano_inters is not None)      # Senão o ponto não está no plano
+        return plano_inters.color_at(surf_point)
+        # else:
+        #     eqn = plano_inters.equacao
+        #     N_dentro = (Vector(eqn[0],eqn[1],eqn[2])).normalize()
+        #     return (-1) * N_dentro
+        # return self.material.color_at(surf_point)
 
 if __name__ == "__main__":
     from color import Color
