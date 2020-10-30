@@ -23,7 +23,7 @@ class Plane:
                     return t, Hit.INSIDE
         return dist, Hit.MISS
 
-    def above(self, ray):
+    def above(self, point):
         plane = self.equacao
         norm_sqr = (plane[0] ** 2) + (plane[1] ** 2) + (plane[2] ** 2)
         # P0: um ponto no plano
@@ -33,14 +33,14 @@ class Plane:
             (plane[2] * -plane[3]) / norm_sqr,
         )
         N = (Vector(plane[0], plane[1], plane[2])).normalize()
-        PP0 = ray.origin - P0
+        PP0 = point - P0
         if (PP0.magnitude() == 0):
             return True
-        
-        PP0 = (ray.origin - P0).normalize()
+
+        PP0 = (point - P0).normalize()
         dot = N.dot_product(PP0)
         
-        if (dot > 0):
+        if (dot >= 0):
             return True
         else:
             return False

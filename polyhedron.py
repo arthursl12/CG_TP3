@@ -31,10 +31,36 @@ class Polyhedron:
                 "hit?": inter
             }
             inters.append(data)
+        
+        # Seleciona apenas as interseções HIT ou INSIDE
+        hits = []
         for data in inters:
-            print(data)
+            if (data["hit?"] != Hit.MISS):
+                hits.append(data)
+        if (len(hits) == 0):
+            return dist, Hit.MISS
+        
+        # Seleciona apenas as interseções na região válida
+        in_the_region = []
+        for data in hits:
+            point = ray.origin + data["new_dist"] * ray.direction
+            above_all = True
+            for plane in self.planos:
+                if (not plane.above(point)):
+                    above_all = False
+            if (above_all):
+                in_the_region.append(data)
+        if (len(in_the_region) == 0):
+            return dist, Hit.MISS
             
-            
+        in_the_region = sorted(in_the_region, key=lambda k: k["new_dist"]) 
+        result = in_the_region[0]["new_dist"]
+        if (result < dist):
+            plane = in_the_region[0]["plano"]
+            if (not plane.above(ray.origin)):
+                return result, Hit.HIT
+            else:
+                return result, Hit.INSIDE
         #     norm_sqr = (plane[0] ** 2) + (plane[1] ** 2) + (plane[2] ** 2)
         #     # p0: um ponto no plano
         #     p0 = Vector(
@@ -127,13 +153,21 @@ if __name__ == "__main__":
     from ray import Ray
     material = Material(Color.from_hex("#D3D3D3"))
     planes = [
-        [0, 1, 0, 60],
-        [1, 0, 0, -300],
-        [-1, 0, 0, -300],
-        [0, 0, -1,-300],
-        [0, 0, 1, -300]
+        [0, 1, 0, -60],
+        [1, 0, 0, 300],
+        [-1, 0, 0, 300],
+        [0, 0, -1, 300],
+        [0, 0, 1, 300]
     ]
     P = Polyhedron(planes, material)
     
+    # ray1 = Ray(Vector(0,0,0), Vector(1,1,1).normalize())
+    # P.intersects(ray1, float('inf'))
+    
     ray1 = Ray(Vector(0,0,0), Vector(1,1,1).normalize())
+    ray2 = Ray(Vector(0,500,500), Vector(0,0,-1))
+    ray3 = Ray(Vector(0,500,500), Vector(1,0,0))
+    
     P.intersects(ray1, float('inf'))
+    P.intersects(ray2, float('inf'))
+    P.intersects(ray3, float('inf'))
