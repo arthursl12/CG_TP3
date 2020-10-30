@@ -20,7 +20,14 @@ class TestPlane:
         N = self.P.normal(Vector(0,60,0), True)
         assert N == Vector(0,1,0)
 
+    def test_above(self):
+        ray1 = Ray(Vector(0,-80,0), Vector(1,1,1))
+        ray2 = Ray(Vector(0,-40,0), Vector(-1,-1,-1))
+        ray3 = Ray(Vector(0,-60,0), Vector(0,1,0))
         
+        assert self.P.above(ray1) == False
+        assert self.P.above(ray2) == True
+        assert self.P.above(ray3) == True
     
     def test_intersects(self):
         ray1 = Ray(Vector(0,-80,0), Vector(1,1,1))

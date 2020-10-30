@@ -23,6 +23,28 @@ class Plane:
                     return t, Hit.INSIDE
         return dist, Hit.MISS
 
+    def above(self, ray):
+        plane = self.equacao
+        norm_sqr = (plane[0] ** 2) + (plane[1] ** 2) + (plane[2] ** 2)
+        # P0: um ponto no plano
+        P0 = Vector(
+            (plane[0] * -plane[3]) / norm_sqr,
+            (plane[1] * -plane[3]) / norm_sqr,
+            (plane[2] * -plane[3]) / norm_sqr,
+        )
+        N = (Vector(plane[0], plane[1], plane[2])).normalize()
+        PP0 = ray.origin - P0
+        if (PP0.magnitude() == 0):
+            return True
+        
+        PP0 = (ray.origin - P0).normalize()
+        dot = N.dot_product(PP0)
+        
+        if (dot > 0):
+            return True
+        else:
+            return False
+    
     def normal(self, surface_point, inside):
         Np = Vector(self.equacao[0], self.equacao[1], self.equacao[2]).normalize()
         if (inside == True):
@@ -42,8 +64,11 @@ if __name__ == "__main__":
     from color import  Color
     from ray import Ray
     material = Material(Color.from_hex("#D3D3D3"))
-    eqn = [0, 1, 0, -60]
+    eqn = [0, 1, 0, 60]
     P = Plane(eqn, material)
     
-    ray1 = Ray(Vector(0,-40,0), Vector(-1,-1,-1))
-    P.intersects(ray1, float('inf'))
+    # ray1 = Ray(Vector(0,-40,0), Vector(-1,-1,-1))
+    # P.intersects(ray1, float('inf'))
+    
+    ray2 = Ray(Vector(0,-40,0), Vector(-1,-1,-1))
+    P.above(ray2) == True
