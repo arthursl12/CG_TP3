@@ -29,6 +29,13 @@ class Plane:
             return Np
         else:
             return (-1) * Np
+    
+    def color_at(self, surf_point):
+        if (self.material.texture is None):
+            return self.material.color_at(surf_point)
+        else:     
+            c = self.material.get_texel(surf_point)
+            return c
 
 if __name__ == "__main__":
     from material import Material

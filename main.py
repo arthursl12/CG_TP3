@@ -14,6 +14,7 @@ from light import Light
 from material import ChequeredMaterial, Material, Texture
 from point import Point
 from polyhedron import Polyhedron
+from plane import Plane
 from scene import Scene
 from sphere import Sphere
 from vector import (Vector, list_from_string, vector_from_list,
@@ -164,7 +165,7 @@ def main():
                         float(face_descr[0]),
                         float(face_descr[1]),
                         float(face_descr[2]),
-                        -float(face_descr[3]),
+                        float(face_descr[3]),
                     ])
                 new_material = copy.deepcopy(pigms[mat])
                 new_acab = copy.deepcopy(acabs[acab])
@@ -178,7 +179,8 @@ def main():
                     new_acab[6]
                 )
                 poly = Polyhedron(planos, new_material)
-                objects.append(poly)
+                plano = Plane(planos[0], new_material)
+                objects.append(plano)
                 
 
     # Montagem da cena
