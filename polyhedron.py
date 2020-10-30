@@ -4,8 +4,8 @@ Região convexa definida por N planos. A computação desse poliedro é feita vi
 programação linear, logo ressalta-se a importância de que as normais dos planos 
 estejam apontadas sempre para dentro da região, ou seja, para dentro do poliedro
 
-Forma: Ax >= b  <=>  ax + by + cz + d >= 0
-Eq. Plano: ax + by + cz + d = 0
+Forma: Ax >= b  <=>  ax + by + cz >= d
+Eq. Plano: ax + by + cz = d
 """
 from plane import Plane
 from sphere import Hit
@@ -22,17 +22,17 @@ class Polyhedron:
         
     def intersects(self, ray, dist):
         # Computa todas as interseções do raio com cada plano
-        inters = []
-        for plane in self.planos:
-            new_dist, inter = plane.intersects(ray, dist)
-            data = {
-                "plano": plane,
-                "new_dist": new_dist,
-                "hit?": inter
-            }
-            inters.append(data)
+        plano_principal = self.planos[0]
+        new_dist, inter = plano_principal.intersects(ray, dist)
+        if (inter == Hit.MISS):
+            return dist, Hit.MISS
         
-        # Seleciona apenas as interseções HIT ou INSIDE
+        point = ray.origin + new_dist * ray.direction
+        valid = True
+        for i in range(1,len(self.planos)):
+            plano = self.planos[i]
+            v
+        
         hits = []
         for data in inters:
             if (data["hit?"] != Hit.MISS):
@@ -126,13 +126,14 @@ class Polyhedron:
     def normal(self, surface_point, inside):
         # Acha o plano de interseção
         point = surface_point
+        plano_inters = None
         for plane in self.planos:
             eqn = plane.equacao
             res = (
                 point.x * eqn[0]
                 + point.y * eqn[1]
                 + point.z * eqn[2]
-                + eqn[3]
+                - eqn[3]
             )
             if (abs(res) < 0.001):
                 plano_inters = plane

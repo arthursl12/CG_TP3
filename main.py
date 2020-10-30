@@ -57,6 +57,7 @@ def main():
         # Luzes
         lights = []
         qtd_lights = int(in_file.readline())
+        print(qtd_lights)
         primeira = True
         for i in range(qtd_lights):
             lgt = list_from_string(in_file.readline())
@@ -79,6 +80,7 @@ def main():
         # Pigmentos
         pigms = []
         qtd_pigms = int(in_file.readline())
+        print(qtd_pigms)
         for i in range(qtd_pigms):
             pigm = list_from_string(in_file.readline())
             if (pigm[0] == "texmap"):
@@ -117,6 +119,7 @@ def main():
         # Acabamentos
         acabs = []
         qtd_acabs = int(in_file.readline())
+        print(qtd_acabs)
         for i in range(qtd_acabs):
             acab_list = list_from_string(in_file.readline())
             assert len(acab_list) == 7
@@ -165,7 +168,7 @@ def main():
                         float(face_descr[0]),
                         float(face_descr[1]),
                         float(face_descr[2]),
-                       -float(face_descr[3]),
+                        -float(face_descr[3]),
                     ])
                 new_material = copy.deepcopy(pigms[mat])
                 new_acab = copy.deepcopy(acabs[acab])
@@ -178,11 +181,9 @@ def main():
                     new_acab[5],
                     new_acab[6]
                 )
-                poly = Polyhedron(planos, new_material)
-                for plane in planos:
-                    plano = Plane(plane, new_material)
-                    objects.append(plano)
-                
+                # poly = Polyhedron(planos, new_material)
+                plano = Plane(planos[0], new_material)
+                objects.append(plano)
 
     # Montagem da cena
     camera = Camera(cam_pos, look_at, up, fov, aspect_ratio)

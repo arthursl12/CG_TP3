@@ -10,7 +10,7 @@ class TestPlane:
     @classmethod
     def setup_class(cls):
         material = Material(Color.from_hex("#D3D3D3"))
-        cls.eqn = [0, 1, 0, 60]
+        cls.eqn = [0, 1, 0, -60]
         cls.P = Plane(cls.eqn, material)
     
     def test_normal(self):

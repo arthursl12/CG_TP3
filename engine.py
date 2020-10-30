@@ -64,7 +64,7 @@ class RenderEngine:
             rcol, rt, raRIndex = self.ray_trace(new_ray, scene, aRIndex=aRIndex, t=float('inf'), depth=depth+1, color=Color(0,0,0))
             color = Color(color.x, color.y, color.z)
             color += rcol * obj_hit.material.reflection
-            color += obj_hit.material.reflection * obj_hit.material.color_at(hit_pos) * 0.03
+            # color += obj_hit.material.reflection * obj_hit.material.color_at(hit_pos)
 
         # Cálculo da Refração
         if (depth < self.MAX_DEPTH and obj_hit.material.refraction > 0):

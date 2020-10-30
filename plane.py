@@ -2,7 +2,7 @@ from vector import Vector
 from sphere import Hit
 
 class Plane:
-    """Formato da Equação: ax + by + cz + d = 0"""
+    """Formato da Equação: ax + by + cz = d"""
     def __init__(self, equacao, material):
         self.equacao = equacao
         self.material = material
@@ -14,7 +14,7 @@ class Plane:
         P0 = ray.origin
         hit = False
         if (V.dot_product(N) != 0):
-            t = -(P0.dot_product(N) + plane[3]) / (V.dot_product(N))
+            t = -(P0.dot_product(N) + (-plane[3])) / (V.dot_product(N))
             if (t >= 0 and t < dist):
                 hit = True
                 if (V.dot_product(N) > 0):
@@ -28,9 +28,9 @@ class Plane:
         norm_sqr = (plane[0] ** 2) + (plane[1] ** 2) + (plane[2] ** 2)
         # P0: um ponto no plano
         P0 = Vector(
-            (plane[0] * -plane[3]) / norm_sqr,
-            (plane[1] * -plane[3]) / norm_sqr,
-            (plane[2] * -plane[3]) / norm_sqr,
+            (plane[0] * plane[3]) / norm_sqr,
+            (plane[1] * plane[3]) / norm_sqr,
+            (plane[2] * plane[3]) / norm_sqr,
         )
         N = (Vector(plane[0], plane[1], plane[2])).normalize()
         PP0 = point - P0

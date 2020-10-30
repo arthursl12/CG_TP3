@@ -11,11 +11,11 @@ class TestPolyhedron:
     def setup_class(cls):
         material = Material(Color.from_hex("#D3D3D3"))
         cls.planes = [
-            [0, 1, 0, -60],
-            [1, 0, 0, 300],
-            [-1, 0, 0, 300],
-            [0, 0, -1, 300],
-            [0, 0, 1, 300]
+            [0, 1, 0, 60],
+            [1, 0, 0, -300],
+            [-1, 0, 0, -300],
+            [0, 0, -1, -300],
+            [0, 0, 1, -300]
         ]
         cls.P = Polyhedron(cls.planes, material)
     
