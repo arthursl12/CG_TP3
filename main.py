@@ -104,8 +104,8 @@ def main():
                     float(pigm[6])
                 )
                 tam = float(pigm[7])
-                ## TODO: implementar tamanho no xadrez
-                check = ChequeredMaterial(color1=cor1, color2=cor2)
+                print(tam)
+                check = ChequeredMaterial(color1=cor1, color2=cor2, tamanho=tam)
                 pigms.append(check)
             elif (pigm[0] == "solid"):
                 color = Color(

@@ -34,7 +34,6 @@ class Material:
         exp_specular=20,
         reflection=0.9,
         refraction=0.0,
-        refrIndex=1,
         ior=0,
         texture=None
     ):
@@ -45,8 +44,7 @@ class Material:
         self.exp_specular = exp_specular    # alpha
 
         self.reflection = reflection        # kr
-        self.refraction = refraction        # kt
-        self.refrIndex = refrIndex          
+        self.refraction = refraction        # kt   
         self.ior = ior                      # ior
         self.texture = texture
 
@@ -87,22 +85,53 @@ class ChequeredMaterial:
         specular=1.0, 
         reflection=0.5,
         refraction=0.0,
-        refrIndex=1,
-        exp_specular=20
-    ):
+        ior=0,
+        exp_specular=20,
+        tamanho=15
+    ): 
         self.color1 = color1
         self.color2 = color2
-        self.ambient = ambient
-        self.diffuse = diffuse
-        self.specular = specular
-        self.reflection = reflection
-        self.refraction = refraction
-        self.refrIndex = refrIndex
-        self.exp_specular = exp_specular
+        self.ambient = ambient              # ka
+        self.diffuse = diffuse              # kd
+        self.specular = specular            # ks
+        self.exp_specular = exp_specular    # alpha
+
+        self.reflection = reflection        # kr
+        self.refraction = refraction        # kt
+     
+        self.ior = ior                      # ior
         self.texture = None
-    
-    def color_at(self, position):
-        if (int((position.x + 5.0) * 3) % 2 == int((position.z * 3) % 2)):
+        self.tamanho = tamanho
+        
+    def set_acabamento(self, ka, kd, ks, alpha, kr, kt, ior):
+        """
+        Parâmetros:
+        ka      - coeficiente de luz ambiente
+        kd      - coeficiente de luz difusa
+        ks      - coeficiente de luz especular
+        alpha   - expoente da reflexão especular
+        kr      - coeficiente de reflexão
+        kt      - coeficiente de transmissão (refração)
+        ior     - taxa entre índices de refração ambiente e material (n1/n2)
+        """
+        self.ambient = ka
+        self.diffuse = kd
+        self.specular = ks
+        self.exp_specular = alpha
+        self.reflection = kr
+        self.refraction = kt
+        self.ior = ior
+        
+    def color_at(self, position): 
+        modX = int(position.x) % (self.tamanho * 2.5)
+        modZ = int(position.z) % (self.tamanho * 2.5)
+        
+        def corX(modX):
+            return (modX <= self.tamanho/4 or modX > self.tamanho * 1.5)
+        def corZ(modZ):
+            return (modZ <= self.tamanho/4 or modZ > self.tamanho * 1.5)
+        
+        if (corX(modX) != corZ(modZ)):
             return self.color1
         else:
             return self.color2
