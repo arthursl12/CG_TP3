@@ -44,7 +44,11 @@ class Vector:
         return Vector(self.x / other, self.y / other, self.z / other)
     
     def __eq__(self, other):
-        return (self.x == other.x) and (self.y == other.y) and (self.z == other.z)
+        return (
+            abs(self.x - other.x) < 0.001
+            and abs(self.y - other.y) < 0.001
+            and abs(self.z - other.z) < 0.001
+        )
 
 def list_from_string(string):
     """

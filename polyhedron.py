@@ -77,12 +77,27 @@ class Polyhedron:
         else:
             return t_result, Hit.HIT
             
-                
-            
-    
     def normal(self, surface_point, inside):
-        pass
-    
+        # Acha o plano de interseção
+        point = surface_point
+        for plane in self.planos:
+            lhs = (
+                point.x * plane[0]
+                + point.y * plane[1]
+                + point.z * plane[2]
+            )
+            rhs = plane[3]
+            if (abs(lhs-rhs) < 0.001):
+                plano_inters = plane
+                break
+            
+        assert (plano_inters is not None)      # Senão o ponto não está no plano
+        if (inside):
+            return (Vector(plano_inters[0],plano_inters[1],plano_inters[2])).normalize()
+        else:
+            N_dentro = (Vector(plano_inters[0],plano_inters[1],plano_inters[2])).normalize()
+            return (-1) * N_dentro
+        
     def color_at(self, surf_point):
         pass
 

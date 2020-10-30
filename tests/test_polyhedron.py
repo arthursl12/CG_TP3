@@ -20,8 +20,13 @@ class TestPolyhedron:
         cls.P = Polyhedron(cls.planes, material)
     
     def test_normal(self):
-        N = self.P.normal(Vector(0,6,0), False)
+        N = self.P.normal(Vector(0,60,0), False)
+        assert N == Vector(0,-1,0)
+        
+        N = self.P.normal(Vector(0,60,0), True)
         assert N == Vector(0,1,0)
+
+        
     
     def test_intersects(self):
         ray1 = Ray(Vector(0,0,0), Vector(1,1,1).normalize())
