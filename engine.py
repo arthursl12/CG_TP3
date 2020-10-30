@@ -100,7 +100,14 @@ class RenderEngine:
             r = Ray(hit_pos - N * self.MIN_DISPLACE, refr_direction)
             rcol, rt, raRIndex = self.ray_trace(r, scene, depth=depth+1, aRIndex=aRIndex, t=float('inf'), color=Color(0,0,0))
             rcol = Color(rcol.x, rcol.y, rcol.z)
-            color += rcol * refr
+            absorb = self.color_at(obj_hit, hit_pos, hit_normal, scene, ray) * 0.00015 * -t
+            transp = Color(
+                math.exp(absorb.x), 
+                math.exp(absorb.y), 
+                math.exp(absorb.z)
+            )
+            # color += transp * refr
+            color += (rcol * refr)
 
         return color, t, aRIndex
 

@@ -12,7 +12,7 @@ class TestSphere:
         cls.S = Sphere(Vector(5,5,5), 1, material)
 
     def test_normal(self):
-        N = self.S.normal(Vector(5,6,5))
+        N = self.S.normal(Vector(5,6,5), False)
         assert N == Vector(0,1,0)
     
     def test_intersects(self):
