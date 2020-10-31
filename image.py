@@ -1,4 +1,7 @@
+from math import sqrt
+
 from color import Color
+
 
 class Image:
     def __init__(self, width, height):
