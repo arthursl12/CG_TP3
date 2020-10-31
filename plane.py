@@ -57,22 +57,22 @@ class Plane:
         if (self.material.texture is None):
             return self.material.color_at(surf_point)
         else:
-            # Queremos achar e1 e e2 bases do plano
-            Np = Vector(self.equacao[0], self.equacao[1], self.equacao[2]).normalize()
-            e1 = (Np.cross_product(Vector(1, 0, 0))).normalize()
-            if (e1 == Vector(0, 0, 0)):
-                # Se Np e e1 forem paralelos
-                e1 = (Np.cross_product(Vector(0, 0, 1))).normalize()
+            # # Queremos achar e1 e e2 bases do plano
+            # Np = Vector(self.equacao[0], self.equacao[1], self.equacao[2]).normalize()
+            # e1 = (Np.cross_product(Vector(1, 0, 0))).normalize()
+            # if (e1 == Vector(0, 0, 0)):
+            #     # Se Np e e1 forem paralelos
+            #     e1 = (Np.cross_product(Vector(0, 0, 1))).normalize()
             
-            e2 = (Np.cross_product(e1)).normalize()
-            h = self.material.texture.height
-            w = self.material.texture.width
-            u = surf_point.dot_product(e1) * w
-            v = surf_point.dot_product(e2) * h
-            v_bound = round(v) % h
-            u_bound = round(u) % w
-            c = self.material.texture.get_pixel(u_bound,v_bound)
-
+            # e2 = (Np.cross_product(e1)).normalize()
+            # h = self.material.texture.height
+            # w = self.material.texture.width
+            # u = surf_point.dot_product(e1) * w
+            # v = surf_point.dot_product(e2) * h
+            # v_bound = round(v) % h
+            # u_bound = round(u) % w
+            # c = self.material.texture.get_pixel(u_bound,v_bound)
+            c = self.material.get_texel(surf_point)
             return c
 
 if __name__ == "__main__":
