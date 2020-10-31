@@ -17,4 +17,6 @@ class Light:
         fator  = self.attenuation[0]
         fator += self.attenuation[1] * dist
         fator += self.attenuation[1] * (dist ** 2)
+        if (fator == 0):
+            return 7
         return 1.0 / fator

@@ -138,6 +138,7 @@ def read_ppm_p6(img_file):
     size_list = size.split(' ')
     width = int(size_list[0])
     height = int(size_list[1])
+    print(f"{width} x {height}")
     
     im = Image(width, height)
     if (cabecalho == "P3"):
@@ -153,14 +154,12 @@ def read_ppm_p6(img_file):
             else:
                 curr_line = line.strip()
                 byte_line = curr_line
-
         for j in range(height):
             for i in range(width):
-                idx_r = 3*i
+                idx_r = 3*(i + width * j)
                 r = float(byte_line[idx_r]  ) / float(max_color)
                 g = float(byte_line[idx_r+1]) / float(max_color)
                 b = float(byte_line[idx_r+2]) / float(max_color)
-                
                 im.set_pixel(i, j, Color(r,g,b))
         return im
     else:

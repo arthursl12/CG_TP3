@@ -92,6 +92,9 @@ def main():
                 text = Texture(text_file, u_vector=p0, v_vector=p1)
                 texture_mat = Material(color=Color.from_hex("#000000"), texture=text)
                 pigms.append(texture_mat)
+                img = texture_mat.texture.map
+                with open('test.ppm','w') as test:
+                    img.write_ppm(test, 1)
             elif (pigm[0] == "checker"):
                 cor1 = Color(
                     float(pigm[1]), 

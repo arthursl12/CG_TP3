@@ -20,7 +20,10 @@ class Texture:
         v = abs(point.dot_product(self.v_vector)) * self.height
         v_bound = min(round(v), self.height-1)
         u_bound = min(round(u), self.width-1)
-        return self.map.pixels[v_bound][u_bound]
+        return self.get_pixel(u_bound, v_bound)
+    
+    def get_pixel(self, u, v):
+        return self.map.pixels[v][u]
         
 
 class Material:
