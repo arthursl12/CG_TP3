@@ -74,7 +74,7 @@ def main():
                 lights.append(Light(lgt_pos, lgt_color, lgt_att, ambient=True))
                 primeira = False
             else:
-                lights.append(Light(lgt_pos, lgt_color, lgt_att, ambient=True))
+                lights.append(Light(lgt_pos, lgt_color, lgt_att, ambient=False))
         
         # Materiais
         # Pigmentos

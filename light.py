@@ -16,7 +16,8 @@ class Light:
     def get_attenuation(self, dist):
         fator  = self.attenuation[0]
         fator += self.attenuation[1] * dist
-        fator += self.attenuation[1] * (dist ** 2)
-        if (fator == 0):
-            return 7
-        return 1.0 / fator
+        fator += self.attenuation[2] * (dist ** 2)
+        if fator == 0:
+            return 1
+        fator = min(1.0 / fator, 1)
+        return fator
