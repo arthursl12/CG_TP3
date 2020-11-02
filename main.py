@@ -5,6 +5,7 @@ import argparse
 import copy
 import importlib
 import os
+import tempfile
 
 from camera import Camera
 from color import Color
@@ -42,17 +43,42 @@ def main():
     print(args.tamanho)
     width = args.tamanho[0]
     height = args.tamanho[1]
-    
+    FPS = 5
     
     aspect_ratio = float(width) / height
     # Leitura do arquivo de entrada
     # Assumindo que não há comentários
     with open(args.arquivo_entrada) as in_file:
-        # Câmera
-        cam_pos = vector_from_string(in_file.readline())
-        look_at = vector_from_string(in_file.readline())
-        up = vector_from_string(in_file.readline())
-        fov = float(in_file.readline())
+        first = list_from_string(in_file.readline())
+        movimento = False
+        if (len(first) < 3):
+            # Câmera em movimento
+            movimento = True
+            qtd_posicoes = int(first[0])
+            total_segs = int(first[1])
+            total_frames = FPS * total_segs
+            posicoes = []
+            for i in range(qtd_posicoes):
+                _cam_pos = vector_from_string(in_file.readline())
+                _look_at = vector_from_string(in_file.readline())
+                _up = vector_from_string(in_file.readline())
+                _fov = float(in_file.readline())
+                pos = {
+                    "cam_pos": _cam_pos,
+                    "look_at": _look_at,
+                    "up": _up,
+                    "fov": _fov
+                }
+                posicoes.append(pos)
+            
+        else:
+            # Câmera estática
+            movimento = False
+            # Câmera
+            cam_pos = vector_from_list(first)
+            look_at = vector_from_string(in_file.readline())
+            up = vector_from_string(in_file.readline())
+            fov = float(in_file.readline())
         
         # Luzes
         lights = []
@@ -189,15 +215,57 @@ def main():
                 objects.append(plano)
 
     # Montagem da cena
-    camera = Camera(cam_pos, look_at, up, fov, aspect_ratio)
-    scene = Scene(camera, objects, lights, width, height)
-    engine = RenderEngine()
-    qtd_samples = 1
+    if movimento:
+        # pos = {
+        #             "cam_pos": _cam_pos,
+        #             "look_at": _look_at,
+        #             "up": _up,
+        #             "fov": _fov
+        #         }
+        cam_passo = (posicoes[1]["cam_pos"] - posicoes[0]["cam_pos"]) / total_frames
+        look_at_passo = (posicoes[1]["look_at"] - posicoes[0]["look_at"]) / total_frames
+        up_passo = (posicoes[1]["up"] - posicoes[0]["up"]) / total_frames
+        fov_passo = (posicoes[1]["fov"] - posicoes[0]["fov"]) / total_frames
+        
+        import imageio
+        import shutil
+        images = []
+        filenames = []
+        dirpath = tempfile.mkdtemp()
+        for frame_i in range(total_frames):
+            cam_pos = posicoes[0]["cam_pos"] + frame_i * cam_passo
+            look_at = posicoes[0]["look_at"] + frame_i * look_at_passo
+            up = posicoes[0]["up"] + frame_i * up_passo
+            fov = posicoes[0]["fov"] + frame_i * fov_passo
+            camera = Camera(cam_pos, look_at, up, fov, aspect_ratio)
+            scene = Scene(camera, objects, lights, width, height)
+            engine = RenderEngine()
+            qtd_samples = 1
 
-    # Raytracing & Render
-    image = engine.render(scene, qtd_samples)
-    with open(args.arquivo_saida, "w") as img_file:
-        image.write_ppm(img_file, qtd_samples)
+            # Raytracing & Render
+            image = engine.render(scene, qtd_samples)
+            file_name = dirpath + f"temp{frame_i}.ppm"
+            filenames.append(file_name)
+            with open(file_name, "w") as img_file:
+                image.write_ppm(img_file, qtd_samples)
+            print(f"{float(frame_i)/float(total_frames) * 100:3.0f}%")
+            
+            
+        for filename in filenames:
+            images.append(imageio.imread(filename))
+        saida = args.arquivo_saida[0:-4]
+        imageio.mimsave(saida+".gif", images, "GIF", fps=FPS)
+        shutil.rmtree(dirpath)
+    else:
+        camera = Camera(cam_pos, look_at, up, fov, aspect_ratio)
+        scene = Scene(camera, objects, lights, width, height)
+        engine = RenderEngine()
+        qtd_samples = 1
+
+        # Raytracing & Render
+        image = engine.render(scene, qtd_samples)
+        with open(args.arquivo_saida, "w") as img_file:
+            image.write_ppm(img_file, qtd_samples)
 
 
 if __name__ == "__main__":
