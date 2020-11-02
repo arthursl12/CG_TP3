@@ -57,6 +57,21 @@ def main():
             qtd_posicoes = int(first[0])
             total_segs = int(first[1])
             total_frames = FPS * total_segs
+            
+            # Tempo das transições
+            transicoes = list_from_string(in_file.readline())
+            assert len(transicoes) == (qtd_posicoes-1)
+            tempo_transicoes = []
+            soma = 0
+            for i in range(len(transicoes)):
+                trans = (float)(transicoes[i])
+                tempo_transicoes.append(trans)
+                soma += trans
+            print(tempo_transicoes)
+            print(f"{soma} ?= {total_segs}")
+            assert soma == total_segs
+
+            # Posições da câmera
             posicoes = []
             for i in range(qtd_posicoes):
                 _cam_pos = vector_from_string(in_file.readline())
@@ -216,41 +231,40 @@ def main():
 
     # Montagem da cena
     if movimento:
-        # pos = {
-        #             "cam_pos": _cam_pos,
-        #             "look_at": _look_at,
-        #             "up": _up,
-        #             "fov": _fov
-        #         }
-        cam_passo = (posicoes[1]["cam_pos"] - posicoes[0]["cam_pos"]) / total_frames
-        look_at_passo = (posicoes[1]["look_at"] - posicoes[0]["look_at"]) / total_frames
-        up_passo = (posicoes[1]["up"] - posicoes[0]["up"]) / total_frames
-        fov_passo = (posicoes[1]["fov"] - posicoes[0]["fov"]) / total_frames
-        
         import imageio
         import shutil
         images = []
         filenames = []
         dirpath = tempfile.mkdtemp()
-        for frame_i in range(total_frames):
-            cam_pos = posicoes[0]["cam_pos"] + frame_i * cam_passo
-            look_at = posicoes[0]["look_at"] + frame_i * look_at_passo
-            up = posicoes[0]["up"] + frame_i * up_passo
-            fov = posicoes[0]["fov"] + frame_i * fov_passo
-            camera = Camera(cam_pos, look_at, up, fov, aspect_ratio)
-            scene = Scene(camera, objects, lights, width, height)
-            engine = RenderEngine()
-            qtd_samples = 1
+        frames_process = 0
+        for j in range(len(tempo_transicoes)):
+            frames_secao = (int)(tempo_transicoes[j] * FPS)
+            for i in range(frames_secao):
+                cam_passo = (posicoes[j+1]["cam_pos"] - posicoes[j]["cam_pos"]) / frames_secao
+                look_at_passo = (posicoes[j+1]["look_at"] - posicoes[j]["look_at"]) / frames_secao
+                up_passo = (posicoes[j+1]["up"] - posicoes[j]["up"]) / frames_secao
+                fov_passo = (posicoes[j+1]["fov"] - posicoes[j]["fov"]) / frames_secao
+                
+                cam_pos = posicoes[j]["cam_pos"] + i * cam_passo
+                look_at = posicoes[j]["look_at"] + i * look_at_passo
+                up = posicoes[j]["up"] + i * up_passo
+                fov = posicoes[j]["fov"] + i * fov_passo
+                camera = Camera(cam_pos, look_at, up, fov, aspect_ratio)
+                scene = Scene(camera, objects, lights, width, height)
+                engine = RenderEngine()
+                qtd_samples = 1
 
-            # Raytracing & Render
-            image = engine.render(scene, qtd_samples)
-            file_name = dirpath + f"temp{frame_i}.ppm"
-            filenames.append(file_name)
-            with open(file_name, "w") as img_file:
-                image.write_ppm(img_file, qtd_samples)
-            print(f"{float(frame_i)/float(total_frames) * 100:3.0f}%")
+                # Raytracing & Render
+                image = engine.render(scene, qtd_samples)
+                file_name = dirpath + f"temp{i}-{j}.ppm"
+                filenames.append(file_name)
+                with open(file_name, "w") as img_file:
+                    image.write_ppm(img_file, qtd_samples)
+                    
+                frames_process += 1
+                print(f"{float(frames_process)/float(total_frames) * 100:3.0f}%") 
             
-            
+        print("Gerando GIF")      
         for filename in filenames:
             images.append(imageio.imread(filename))
         saida = args.arquivo_saida[0:-4]
