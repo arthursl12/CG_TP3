@@ -172,7 +172,7 @@ def main():
         qtd_acabs = int(in_file.readline())
         for i in range(qtd_acabs):
             acab_list = list_from_string(in_file.readline())
-            assert len(acab_list) == 7
+            assert len(acab_list) == 7 or len(acab_list) == 8
             for j in range(len(acab_list)):
                 acab_list[j] = float(acab_list[j])
             acabs.append(acab_list)
@@ -202,6 +202,8 @@ def main():
                     new_acab[5],
                     new_acab[6]
                 )
+                if (len(new_acab) == 8):
+                    new_material.diff_reflection = new_acab[7]
                 # new_material.color = Color.from_hex("#FFF3F3")
                 esfera = Sphere(centro, raio, new_material)
                 objects.append(esfera)
@@ -231,14 +233,14 @@ def main():
                     new_acab[5],
                     new_acab[6]
                 )
-                # poly = Polyhedron(planos, new_material)
+                if (len(new_acab) == 8):
+                    new_material.diff_reflection = new_acab[7]
                 plano = Plane(planos[0], new_material)
                 objects.append(plano)
 
     # Montagem da cena
     if movimento:
         import shutil
-
         import imageio
         images = []
         filenames = []

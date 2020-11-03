@@ -56,50 +56,46 @@ class RenderEngine:
         
         qtd_samples_refl = samples_refl
         # Cálculo da Reflexão
-        if (depth < self.MAX_DEPTH and obj_hit.material.reflection > 0 and qtd_samples_refl >= 1):
-            # new_ray_pos = hit_pos + hit_normal * self.MIN_DISPLACE
-            # new_ray_dir = ray.direction - 2 * ray.direction.dot_product(hit_normal) * hit_normal
-            # new_ray = Ray(new_ray_pos, new_ray_dir)
+        if (depth < self.MAX_DEPTH and obj_hit.material.reflection > 0):
+            if (obj_hit.material.diff_reflection > 0):
+                if (qtd_samples_refl >= 1):
+                    RP = ray.direction - 2 * ray.direction.dot_product(hit_normal) * hit_normal
+                    new_ray_pos = hit_pos + hit_normal * self.MIN_DISPLACE
+                    RN1 = Vector(RP.z, RP.y, -RP.x)
+                    RN2 = RP.cross_product(RN1)
+                    refl = 1.0 / qtd_samples_refl
+                    drefl = obj_hit.material.diff_reflection
+                    for i in range(qtd_samples_refl):
+                        xoffs = random.random() * drefl
+                        yoffs = random.random() * drefl
+                        while ((xoffs * xoffs + yoffs * yoffs) > (drefl * drefl)):
+                            xoffs = random.random() * drefl
+                            yoffs = random.random() * drefl
+                            # print(f"{xoffs}, {yoffs}, {drefl}")
+                        R = RP + RN1 * xoffs + RN2 * yoffs * drefl
+                        R = R.normalize()
+                        new_pos = hit_pos + R * self.MIN_DISPLACE
+                        new_ray = Ray(new_pos, R)
+                        next_samples = round(max(qtd_samples_refl * 0.25,1))
+                        rcol, rt, raRIndex = self.ray_trace(
+                            new_ray, scene, 
+                            aRIndex=aRIndex, 
+                            t=float('inf'), 
+                            depth=depth+1, 
+                            color=Color(0,0,0), 
+                            samples_refl=next_samples
+                        )
+                        color += rcol * obj_hit.material.reflection * refl
+            else:
+                new_ray_pos = hit_pos + hit_normal * self.MIN_DISPLACE
+                new_ray_dir = ray.direction - 2 * ray.direction.dot_product(hit_normal) * hit_normal
+                new_ray = Ray(new_ray_pos, new_ray_dir)
 
-            # # Atenuar o raio refletido pelo coeficiente de reflexão
-            # rcol, rt, raRIndex = self.ray_trace(new_ray, scene, aRIndex=aRIndex, t=float('inf'), depth=depth+1, color=Color(0,0,0))
-            # color = Color(color.x, color.y, color.z)
-            # color += rcol * obj_hit.material.reflection
-            # color += obj_hit.material.reflection * obj_hit.material.color_at(hit_pos)
-            RP = ray.direction - 2 * ray.direction.dot_product(hit_normal) * hit_normal
-            
-            new_ray_pos = hit_pos + hit_normal * self.MIN_DISPLACE
-            RN1 = Vector(RP.z, RP.y, -RP.x)
-            RN2 = RP.cross_product(RN1)
-            refl = 1.0 / qtd_samples_refl
-            drefl = obj_hit.material.reflection
-            for i in range(qtd_samples_refl):
-                xoffs = random.random() * drefl
-                yoffs = random.random() * drefl
-                while ((xoffs * xoffs + yoffs * yoffs) > (drefl * drefl)):
-                    xoffs = random.random() * drefl
-                    yoffs = random.random() * drefl
-                    # print(f"{xoffs}, {yoffs}, {drefl}")
-                R = RP + RN1 * xoffs + RN2 * yoffs * drefl
-                R = R.normalize()
-                new_pos = hit_pos + R * self.MIN_DISPLACE
-                new_ray = Ray(new_pos, R)
-                next_samples = round(max(qtd_samples_refl * 0.25,1))
-                rcol, rt, raRIndex = self.ray_trace(
-                    new_ray, scene, 
-                    aRIndex=aRIndex, 
-                    t=float('inf'), 
-                    depth=depth+1, 
-                    color=Color(0,0,0), 
-                    samples_refl=next_samples
-                )
-                color += rcol * obj_hit.material.reflection * refl
-                # color += obj_hit.material.reflection * obj_hit.material.color_at(hit_pos) * refl
-            # Atenuar o raio refletido pelo coeficiente de reflexão
-            # rcol, rt, raRIndex = self.ray_trace(new_ray, scene, aRIndex=aRIndex, t=float('inf'), depth=depth+1, color=Color(0,0,0))
-            # color = Color(color.x, color.y, color.z)
-            # color += rcol * obj_hit.material.reflection
-            # color += obj_hit.material.reflection * obj_hit.material.color_at(hit_pos)
+                # Atenuar o raio refletido pelo coeficiente de reflexão
+                rcol, rt, raRIndex = self.ray_trace(new_ray, scene, aRIndex=aRIndex, t=float('inf'), depth=depth+1, color=Color(0,0,0))
+                color = Color(color.x, color.y, color.z)
+                color += rcol * obj_hit.material.reflection
+
         # Cálculo da Refração
         if (depth < self.MAX_DEPTH and obj_hit.material.refraction > 0):
             refr = obj_hit.material.refraction

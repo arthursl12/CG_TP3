@@ -36,7 +36,7 @@ class Material:
         specular=1.0,
         exp_specular=20,
         reflection=0.9,
-        diff_reflection=0.7,
+        diff_reflection=0,
         refraction=0.0,
         ior=0,
         texture=None
@@ -90,7 +90,7 @@ class ChequeredMaterial:
         diffuse=1.0, 
         specular=1.0, 
         reflection=0.5,
-        diff_reflection=0.7,
+        diff_reflection=0,
         refraction=0.0,
         ior=0,
         exp_specular=20,

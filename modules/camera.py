@@ -8,6 +8,7 @@ class Camera:
     def __init__(self, eye, look_at, up, vfov, aspect_ratio):
         # Definição dos tamanhos do plano de projeção, com base no ângulo de fov
         # e no aspect_ratio
+        vfov = min(75,vfov)
         theta = math.radians(vfov)
         self.h = math.tan(theta) / 2
         self.aspect_ratio = aspect_ratio
