@@ -58,7 +58,6 @@ def main():
     height = args.tamanho[1]
     FPS = 5
     aspect_ratio = float(width) / height
-    print(args.samples)
     
     # Leitura do arquivo de entrada
     # Assumindo que não há comentários

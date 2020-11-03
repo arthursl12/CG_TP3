@@ -14,7 +14,7 @@ from modules.vector import Vector
 class RenderEngine:
     """Renderiza os objetos no plano de renderização"""
 
-    MAX_DEPTH = 10
+    MAX_DEPTH = 5
     MIN_DISPLACE = 0.1
 
     def render(self, scene, qtd_samples):
@@ -41,7 +41,7 @@ class RenderEngine:
             print(f"{float(height-j)/float(height) * 100:3.0f}%", end="\r")
         return pixels
     
-    def ray_trace(self, ray, scene, aRIndex, t, color, depth=0):
+    def ray_trace(self, ray, scene, aRIndex, t, color, depth=0, samples_refl=8):
         # Encontra o objeto mais próximo que o raio intercepta
         t, obj_hit, case = self.find_nearest(ray, scene)
         if obj_hit is None:
@@ -53,19 +53,53 @@ class RenderEngine:
             inside = False
         hit_normal = obj_hit.normal(hit_pos, inside)
         color += self.color_at(obj_hit, hit_pos, hit_normal, scene, ray)
-
+        
+        qtd_samples_refl = samples_refl
         # Cálculo da Reflexão
-        if (depth < self.MAX_DEPTH and obj_hit.material.reflection > 0):
-            new_ray_pos = hit_pos + hit_normal * self.MIN_DISPLACE
-            new_ray_dir = ray.direction - 2 * ray.direction.dot_product(hit_normal) * hit_normal
-            new_ray = Ray(new_ray_pos, new_ray_dir)
+        if (depth < self.MAX_DEPTH and obj_hit.material.reflection > 0 and qtd_samples_refl >= 1):
+            # new_ray_pos = hit_pos + hit_normal * self.MIN_DISPLACE
+            # new_ray_dir = ray.direction - 2 * ray.direction.dot_product(hit_normal) * hit_normal
+            # new_ray = Ray(new_ray_pos, new_ray_dir)
 
-            # Atenuar o raio refletido pelo coeficiente de reflexão
-            rcol, rt, raRIndex = self.ray_trace(new_ray, scene, aRIndex=aRIndex, t=float('inf'), depth=depth+1, color=Color(0,0,0))
-            color = Color(color.x, color.y, color.z)
-            color += rcol * obj_hit.material.reflection
+            # # Atenuar o raio refletido pelo coeficiente de reflexão
+            # rcol, rt, raRIndex = self.ray_trace(new_ray, scene, aRIndex=aRIndex, t=float('inf'), depth=depth+1, color=Color(0,0,0))
+            # color = Color(color.x, color.y, color.z)
+            # color += rcol * obj_hit.material.reflection
             # color += obj_hit.material.reflection * obj_hit.material.color_at(hit_pos)
-
+            RP = ray.direction - 2 * ray.direction.dot_product(hit_normal) * hit_normal
+            
+            new_ray_pos = hit_pos + hit_normal * self.MIN_DISPLACE
+            RN1 = Vector(RP.z, RP.y, -RP.x)
+            RN2 = RP.cross_product(RN1)
+            refl = 1.0 / qtd_samples_refl
+            drefl = obj_hit.material.reflection
+            for i in range(qtd_samples_refl):
+                xoffs = random.random() * drefl
+                yoffs = random.random() * drefl
+                while ((xoffs * xoffs + yoffs * yoffs) > (drefl * drefl)):
+                    xoffs = random.random() * drefl
+                    yoffs = random.random() * drefl
+                    # print(f"{xoffs}, {yoffs}, {drefl}")
+                R = RP + RN1 * xoffs + RN2 * yoffs * drefl
+                R = R.normalize()
+                new_pos = hit_pos + R * self.MIN_DISPLACE
+                new_ray = Ray(new_pos, R)
+                next_samples = round(max(qtd_samples_refl * 0.25,1))
+                rcol, rt, raRIndex = self.ray_trace(
+                    new_ray, scene, 
+                    aRIndex=aRIndex, 
+                    t=float('inf'), 
+                    depth=depth+1, 
+                    color=Color(0,0,0), 
+                    samples_refl=next_samples
+                )
+                color += rcol * obj_hit.material.reflection * refl
+                # color += obj_hit.material.reflection * obj_hit.material.color_at(hit_pos) * refl
+            # Atenuar o raio refletido pelo coeficiente de reflexão
+            # rcol, rt, raRIndex = self.ray_trace(new_ray, scene, aRIndex=aRIndex, t=float('inf'), depth=depth+1, color=Color(0,0,0))
+            # color = Color(color.x, color.y, color.z)
+            # color += rcol * obj_hit.material.reflection
+            # color += obj_hit.material.reflection * obj_hit.material.color_at(hit_pos)
         # Cálculo da Refração
         if (depth < self.MAX_DEPTH and obj_hit.material.refraction > 0):
             refr = obj_hit.material.refraction
@@ -108,7 +142,6 @@ class RenderEngine:
             )
             # color += transp * refr
             color += (rcol * refr)
-
         return color, t, aRIndex
 
     def find_nearest(self, ray, scene):

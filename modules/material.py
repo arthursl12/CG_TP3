@@ -36,6 +36,7 @@ class Material:
         specular=1.0,
         exp_specular=20,
         reflection=0.9,
+        diff_reflection=0.7,
         refraction=0.0,
         ior=0,
         texture=None
@@ -46,8 +47,10 @@ class Material:
         self.specular = specular            # ks
         self.exp_specular = exp_specular    # alpha
 
-        self.reflection = reflection        # kr
-        self.refraction = refraction        # kt   
+        self.reflection = reflection            # kr
+        self.diff_reflection = diff_reflection  # reflexão difusa
+        self.refraction = refraction            # kt   
+        
         self.ior = ior                      # ior
         self.texture = texture
 
@@ -87,6 +90,7 @@ class ChequeredMaterial:
         diffuse=1.0, 
         specular=1.0, 
         reflection=0.5,
+        diff_reflection=0.7,
         refraction=0.0,
         ior=0,
         exp_specular=20,
@@ -99,8 +103,9 @@ class ChequeredMaterial:
         self.specular = specular            # ks
         self.exp_specular = exp_specular    # alpha
 
-        self.reflection = reflection        # kr
-        self.refraction = refraction        # kt
+        self.reflection = reflection            # kr
+        self.diff_reflection = diff_reflection  # reflexão difusa
+        self.refraction = refraction            # kt
      
         self.ior = ior                      # ior
         self.texture = None
