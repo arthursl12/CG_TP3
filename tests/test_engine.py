@@ -1,10 +1,11 @@
-import pytest
 from unittest.mock import Mock
-from engine import RenderEngine
-from scene import Scene
-from vector import Vector
-from sphere import Sphere,Hit
-from ray import Ray
+
+import pytest
+from modules.engine import RenderEngine
+from modules.ray import Ray
+from modules.scene import Scene
+from modules.sphere import Hit, Sphere
+from modules.vector import Vector
 
 
 class TestFindNearest:

@@ -1,7 +1,7 @@
 import pytest
-from vector import (
-    Vector, vector_from_string, list_from_string, vector_from_list
-)
+from modules.vector import (Vector, list_from_string, vector_from_list,
+                            vector_from_string)
+
 
 class TestVector:
     @classmethod

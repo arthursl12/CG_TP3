@@ -5,21 +5,21 @@ import argparse
 import copy
 import importlib
 import os
+import pathlib
 import tempfile
 
-from camera import Camera
-from color import Color
-from engine import RenderEngine
-from image import read_ppm
-from light import Light
-from material import ChequeredMaterial, Material, Texture
-from point import Point
-from polyhedron import Polyhedron
-from plane import Plane
-from scene import Scene
-from sphere import Sphere
-from vector import (Vector, list_from_string, vector_from_list,
-                    vector_from_string)
+from modules.camera import Camera
+from modules.color import Color
+from modules.engine import RenderEngine
+from modules.image import read_ppm
+from modules.light import Light
+from modules.material import ChequeredMaterial, Material, Texture
+from modules.plane import Plane
+from modules.point import Point
+from modules.scene import Scene
+from modules.sphere import Sphere
+from modules.vector import (Vector, list_from_string, vector_from_list,
+                            vector_from_string)
 
 
 def main():
@@ -231,8 +231,9 @@ def main():
 
     # Montagem da cena
     if movimento:
-        import imageio
         import shutil
+
+        import imageio
         images = []
         filenames = []
         dirpath = tempfile.mkdtemp()
@@ -268,7 +269,10 @@ def main():
         for filename in filenames:
             images.append(imageio.imread(filename))
         saida = args.arquivo_saida[0:-4]
-        imageio.mimsave(saida+".gif", images, "GIF", fps=FPS)
+        saida += ".gif"
+        saida = os.path.abspath(saida) 
+        print(saida)
+        imageio.mimsave(saida, images, "GIF", fps=FPS)
         shutil.rmtree(dirpath)
     else:
         camera = Camera(cam_pos, look_at, up, fov, aspect_ratio)
@@ -278,7 +282,9 @@ def main():
 
         # Raytracing & Render
         image = engine.render(scene, qtd_samples)
-        with open(args.arquivo_saida, "w") as img_file:
+        saida = os.path.abspath(args.arquivo_saida) 
+        print(saida)
+        with open(saida, "w") as img_file:
             image.write_ppm(img_file, qtd_samples)
 
 

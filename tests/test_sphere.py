@@ -1,9 +1,10 @@
 import pytest
-from vector import Vector
-from color import Color
-from ray import Ray
-from material import Material
-from sphere import Sphere, Hit
+from modules.color import Color
+from modules.material import Material
+from modules.ray import Ray
+from modules.sphere import Hit, Sphere
+from modules.vector import Vector
+
 
 class TestSphere:
     @classmethod
