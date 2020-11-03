@@ -36,19 +36,29 @@ def main():
         help="(Opcional) Tamanho (largura x altura) da imagem de saída (padrão=800x600)",
         default=[800,600]
     )
+    parser.add_argument(
+        "-a",
+        "--aliasing",
+        action="store",
+        type=int,
+        dest="samples",
+        help="(Opcional) Quantidade de samples para o Anti-aliasing (padrão=4)",
+        default=6
+    )
     args = parser.parse_args()
     print(f"Entrada: {args.arquivo_entrada}")
     path = os.path.dirname(args.arquivo_entrada)
     full_in_path = os.path.abspath(args.arquivo_entrada) 
     print(f"Saída: {args.arquivo_saida}")
     out_path = os.path.dirname(args.arquivo_saida)
-    if not os.path.exists(out_path):
+    if ((not os.path.exists(out_path)) and (len(out_path) >= 1)):
         os.makedirs(out_path)
     print(f"Tamanho: {args.tamanho}")
     width = args.tamanho[0]
     height = args.tamanho[1]
     FPS = 5
     aspect_ratio = float(width) / height
+    print(args.samples)
     
     # Leitura do arquivo de entrada
     # Assumindo que não há comentários
@@ -250,7 +260,7 @@ def main():
                 camera = Camera(cam_pos, look_at, up, fov, aspect_ratio)
                 scene = Scene(camera, objects, lights, width, height)
                 engine = RenderEngine()
-                qtd_samples = 1
+                qtd_samples = args.samples
 
                 # Raytracing & Render
                 image = engine.render(scene, qtd_samples)
@@ -274,7 +284,7 @@ def main():
         camera = Camera(cam_pos, look_at, up, fov, aspect_ratio)
         scene = Scene(camera, objects, lights, width, height)
         engine = RenderEngine()
-        qtd_samples = 1
+        qtd_samples = args.samples
 
         # Raytracing & Render
         image = engine.render(scene, qtd_samples)
