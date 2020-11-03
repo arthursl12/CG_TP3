@@ -96,7 +96,7 @@ def main():
                     "fov": _fov
                 }
                 posicoes.append(pos)
-            
+            up = posicoes[0]["up"]
         else:
             # Câmera estática
             movimento = False
@@ -156,7 +156,7 @@ def main():
                     float(pigm[6])
                 )
                 tam = float(pigm[7])
-                check = ChequeredMaterial(color1=cor1, color2=cor2, tamanho=tam)
+                check = ChequeredMaterial(color1=cor1, color2=cor2, tamanho=tam, up=up)
                 pigms.append(check)
             elif (pigm[0] == "solid"):
                 color = Color(
@@ -235,6 +235,9 @@ def main():
                 )
                 if (len(new_acab) == 8):
                     new_material.diff_reflection = new_acab[7]
+                
+                if (type(new_material) == ChequeredMaterial):
+                    new_material.up = Vector(planos[0][0],planos[0][1],planos[0][2])
                 plano = Plane(planos[0], new_material)
                 objects.append(plano)
 

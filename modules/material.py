@@ -94,10 +94,12 @@ class ChequeredMaterial:
         refraction=0.0,
         ior=0,
         exp_specular=20,
-        tamanho=15
+        tamanho=15,
+        up=Vector(0,1,0)
     ): 
         self.color1 = color1
         self.color2 = color2
+        self.up = up
         self.ambient = ambient              # ka
         self.diffuse = diffuse              # kd
         self.specular = specular            # ks
@@ -109,7 +111,7 @@ class ChequeredMaterial:
      
         self.ior = ior                      # ior
         self.texture = None
-        self.tamanho = tamanho
+        self.tamanho = max(tamanho,2)
         
     def set_acabamento(self, ka, kd, ks, alpha, kr, kt, ior):
         """
@@ -130,16 +132,78 @@ class ChequeredMaterial:
         self.refraction = kt
         self.ior = ior
         
-    def color_at(self, position): 
-        modX = int(position.x) % (self.tamanho * 2.5)
-        modZ = int(position.z) % (self.tamanho * 2.5)
-        
-        def corX(modX):
-            return (modX <= self.tamanho/4 or modX > self.tamanho * 1.5)
-        def corZ(modZ):
-            return (modZ <= self.tamanho/4 or modZ > self.tamanho * 1.5)
-        
-        if (corX(modX) != corZ(modZ)):
-            return self.color1
+    def color_at(self, position):
+        if (self.up == Vector(1,0,0)):
+            modX = int(position.x) % (self.tamanho * 2.5)
+            modZ = int(position.z) % (self.tamanho * 2.5)
+            
+            def corX(modX):
+                return (modX <= self.tamanho/4 or modX > self.tamanho * 1.5)
+            def corZ(modZ):
+                return (modZ <= self.tamanho/4 or modZ > self.tamanho * 1.5)
+            
+            if (corX(modX) != corZ(modZ)):
+                return self.color1
+            else:
+                return self.color2
+        elif (self.up == Vector(0,0,1)):
+            if position.x < 0:
+                x = abs(round(position.x)) + self.tamanho
+            else:
+                x = round(position.x)
+            if position.y < 0:
+                y = abs(round(position.y)) + self.tamanho
+            else:
+                y = round(position.y)
+            
+            mult = 2 if (self.tamanho >= 30) else 3
+            
+            modX = x % (self.tamanho * mult)
+            modY = y % (self.tamanho * mult)
+
+            def corX(modX):
+                return (modX <= self.tamanho)
+            def corY(modY):
+                return (modY <= self.tamanho)
+
+            if (corX(modX) != corY(modY)):
+                return self.color1
+            else:
+                return self.color2
+            
         else:
-            return self.color2
+            if position.x < 0:
+                x = abs(round(position.x)) + self.tamanho
+            else:
+                x = round(position.x)
+            if position.z < 0:
+                z = abs(round(position.z)) + self.tamanho
+            else:
+                z = round(position.z)
+                
+            mult = 2 if (self.tamanho >= 30) else 3
+            
+            modX = x % (self.tamanho * mult)
+            modZ = z % (self.tamanho * mult)
+
+            def corX(modX):
+                return (modX <= self.tamanho)
+            def corZ(modZ):
+                return (modZ <= self.tamanho)
+
+            if (corX(modX) != corZ(modZ)):
+                return self.color1
+            else:
+                return self.color2
+            # modX = int(position.x) % (self.tamanho * 2.5)
+            # modZ = int(position.z) % (self.tamanho * 2.5)
+            
+            # def corX(modX):
+            #     return (modX <= self.tamanho/4 or modX > self.tamanho * 1.5)
+            # def corZ(modZ):
+            #     return (modZ <= self.tamanho/4 or modZ > self.tamanho * 1.5)
+            
+            # if (corX(modX) != corZ(modZ)):
+            #     return self.color1
+            # else:
+            #     return self.color2
