@@ -40,7 +40,6 @@ def read_ppm(file_name):
             else:
                 cabecalho = line.strip()
                 cabeca = True
-    print(cabecalho)
     if (cabecalho == "P3"):
         with open(file_name, "r") as img_file:
             im = read_ppm_p3(img_file)
@@ -138,7 +137,6 @@ def read_ppm_p6(img_file):
     size_list = size.split(' ')
     width = int(size_list[0])
     height = int(size_list[1])
-    print(f"{width} x {height}")
     
     im = Image(width, height)
     if (cabecalho == "P3"):

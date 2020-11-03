@@ -11,7 +11,6 @@ import tempfile
 from modules.camera import Camera
 from modules.color import Color
 from modules.engine import RenderEngine
-from modules.image import read_ppm
 from modules.light import Light
 from modules.material import ChequeredMaterial, Material, Texture
 from modules.plane import Plane
@@ -38,17 +37,22 @@ def main():
         default=[800,600]
     )
     args = parser.parse_args()
-    print(args.arquivo_entrada)
-    print(args.arquivo_saida)
-    print(args.tamanho)
+    print(f"Entrada: {args.arquivo_entrada}")
+    path = os.path.dirname(args.arquivo_entrada)
+    full_in_path = os.path.abspath(args.arquivo_entrada) 
+    print(f"Saída: {args.arquivo_saida}")
+    out_path = os.path.dirname(args.arquivo_saida)
+    if not os.path.exists(out_path):
+        os.makedirs(out_path)
+    print(f"Tamanho: {args.tamanho}")
     width = args.tamanho[0]
     height = args.tamanho[1]
     FPS = 5
-    
     aspect_ratio = float(width) / height
+    
     # Leitura do arquivo de entrada
     # Assumindo que não há comentários
-    with open(args.arquivo_entrada) as in_file:
+    with open(full_in_path) as in_file:
         first = list_from_string(in_file.readline())
         movimento = False
         if (len(first) < 3):
@@ -67,8 +71,6 @@ def main():
                 trans = (float)(transicoes[i])
                 tempo_transicoes.append(trans)
                 soma += trans
-            print(tempo_transicoes)
-            print(f"{soma} ?= {total_segs}")
             assert soma == total_segs
 
             # Posições da câmera
@@ -98,7 +100,6 @@ def main():
         # Luzes
         lights = []
         qtd_lights = int(in_file.readline())
-        print(qtd_lights)
         primeira = True
         for i in range(qtd_lights):
             lgt = list_from_string(in_file.readline())
@@ -121,11 +122,11 @@ def main():
         # Pigmentos
         pigms = []
         qtd_pigms = int(in_file.readline())
-        print(qtd_pigms)
         for i in range(qtd_pigms):
             pigm = list_from_string(in_file.readline())
             if (pigm[0] == "texmap"):
                 text_file = pigm[1]
+                text_file = path + "/" + text_file
                 p0 = list_from_string(in_file.readline())
                 p0 = Vector(float(p0[0]), float(p0[1]), float(p0[2]))
                 p1 = list_from_string(in_file.readline())
@@ -134,8 +135,6 @@ def main():
                 texture_mat = Material(color=Color.from_hex("#000000"), texture=text)
                 pigms.append(texture_mat)
                 img = texture_mat.texture.map
-                with open('test.ppm','w') as test:
-                    img.write_ppm(test, 1)
             elif (pigm[0] == "checker"):
                 cor1 = Color(
                     float(pigm[1]), 
@@ -148,7 +147,6 @@ def main():
                     float(pigm[6])
                 )
                 tam = float(pigm[7])
-                print(tam)
                 check = ChequeredMaterial(color1=cor1, color2=cor2, tamanho=tam)
                 pigms.append(check)
             elif (pigm[0] == "solid"):
@@ -163,7 +161,6 @@ def main():
         # Acabamentos
         acabs = []
         qtd_acabs = int(in_file.readline())
-        print(qtd_acabs)
         for i in range(qtd_acabs):
             acab_list = list_from_string(in_file.readline())
             assert len(acab_list) == 7
@@ -271,7 +268,6 @@ def main():
         saida = args.arquivo_saida[0:-4]
         saida += ".gif"
         saida = os.path.abspath(saida) 
-        print(saida)
         imageio.mimsave(saida, images, "GIF", fps=FPS)
         shutil.rmtree(dirpath)
     else:
@@ -283,7 +279,6 @@ def main():
         # Raytracing & Render
         image = engine.render(scene, qtd_samples)
         saida = os.path.abspath(args.arquivo_saida) 
-        print(saida)
         with open(saida, "w") as img_file:
             image.write_ppm(img_file, qtd_samples)
 
