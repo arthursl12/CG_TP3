@@ -12,14 +12,14 @@ def main():
     folder = os.path.abspath(args.folder)
     onlyfiles = [f for f in os.listdir(folder) if os.path.isfile(os.path.join(folder, f))]
     # print(onlyfiles)
-    out_path = folder + "_jpg"
+    out_path = folder + "_png"
     if ((not os.path.exists(out_path)) and (len(out_path) >= 1)):
         os.makedirs(out_path)
     for f in onlyfiles:
         path = folder + "/" + f
         print(path)
         im = imageio.imread(path)
-        saida = folder + "_jpg" + "/" + f[0:-4] + ".png"
+        saida = folder + "_png" + "/" + f[0:-4] + ".png"
         print(saida)
         imageio.imsave(saida, im, "PNG")
 

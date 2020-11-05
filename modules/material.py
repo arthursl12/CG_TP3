@@ -181,7 +181,7 @@ class ChequeredMaterial:
             else:
                 z = round(position.z)
                 
-            mult = 2 if (self.tamanho >= 30) else 3
+            mult = 2.1 if (self.tamanho >= 20) else 3
             
             modX = x % (self.tamanho * mult)
             modZ = z % (self.tamanho * mult)
