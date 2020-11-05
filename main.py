@@ -1,35 +1,300 @@
 #!/usr/bin/env python
 """
 """
-from color import Color
-from vector import Vector
-from point import Point
-from sphere import Sphere
-from scene import Scene
-from camera import Camera
-from engine import RenderEngine
-from light import Light
-from material import Material
 import argparse
+import copy
 import importlib
 import os
+import pathlib
+import tempfile
+
+from modules.camera import Camera
+from modules.color import Color
+from modules.engine import RenderEngine
+from modules.light import Light
+from modules.material import ChequeredMaterial, Material, Texture
+from modules.plane import Plane
+from modules.point import Point
+from modules.scene import Scene
+from modules.sphere import Sphere
+from modules.vector import (Vector, list_from_string, vector_from_list,
+                            vector_from_string)
+
 
 def main():
+    # Parse dos argumentos
     parser = argparse.ArgumentParser()
-    parser.add_argument("scene", help="Caminho para cena")
+    parser.add_argument("arquivo_entrada", help="Nome arquivo entrada")
+    parser.add_argument("arquivo_saida", help="Nome arquivo saida")
+    parser.add_argument(
+        "-t",
+        "--tamanho",
+        action="store",
+        nargs="+",
+        type=int,
+        dest="tamanho",
+        help="(Opcional) Tamanho (largura x altura) da imagem de saída (padrão=800x600)",
+        default=[800,600]
+    )
+    parser.add_argument(
+        "-a",
+        "--aliasing",
+        action="store",
+        type=int,
+        dest="samples",
+        help="(Opcional) Quantidade de samples para o Anti-aliasing (padrão=4)",
+        default=6
+    )
     args = parser.parse_args()
-    mod = importlib.import_module(args.scene)
+    print(f"Entrada: {args.arquivo_entrada}")
+    path = os.path.dirname(args.arquivo_entrada)
+    full_in_path = os.path.abspath(args.arquivo_entrada) 
+    print(f"Saída: {args.arquivo_saida}")
+    out_path = os.path.dirname(args.arquivo_saida)
+    if ((not os.path.exists(out_path)) and (len(out_path) >= 1)):
+        os.makedirs(out_path)
+    print(f"Tamanho: {args.tamanho}")
+    width = args.tamanho[0]
+    height = args.tamanho[1]
+    FPS = 5
+    aspect_ratio = float(width) / height
+    
+    # Leitura do arquivo de entrada
+    # Assumindo que não há comentários
+    with open(full_in_path) as in_file:
+        first = list_from_string(in_file.readline())
+        movimento = False
+        if (len(first) < 3):
+            # Câmera em movimento
+            movimento = True
+            qtd_posicoes = int(first[0])
+            total_segs = int(first[1])
+            total_frames = FPS * total_segs
+            
+            # Tempo das transições
+            transicoes = list_from_string(in_file.readline())
+            assert len(transicoes) == (qtd_posicoes-1)
+            tempo_transicoes = []
+            soma = 0
+            for i in range(len(transicoes)):
+                trans = (float)(transicoes[i])
+                tempo_transicoes.append(trans)
+                soma += trans
+            assert soma == total_segs
 
-    aspect_ratio = float(mod.WIDTH) / mod.HEIGHT
-    camera = Camera(mod.CAMERA, Vector(0,0,0), Vector(0,1,0), 45, aspect_ratio)
-    scene = Scene(camera, mod.OBJECTS, mod.LIGHTS, mod.WIDTH, mod.HEIGHT)
-    engine = RenderEngine()
-    image = engine.render(scene)
+            # Posições da câmera
+            posicoes = []
+            for i in range(qtd_posicoes):
+                _cam_pos = vector_from_string(in_file.readline())
+                _look_at = vector_from_string(in_file.readline())
+                _up = vector_from_string(in_file.readline())
+                _fov = float(in_file.readline())
+                pos = {
+                    "cam_pos": _cam_pos,
+                    "look_at": _look_at,
+                    "up": _up,
+                    "fov": _fov
+                }
+                posicoes.append(pos)
+            up = posicoes[0]["up"]
+        else:
+            # Câmera estática
+            movimento = False
+            # Câmera
+            cam_pos = vector_from_list(first)
+            look_at = vector_from_string(in_file.readline())
+            up = vector_from_string(in_file.readline())
+            fov = float(in_file.readline())
+        
+        # Luzes
+        lights = []
+        qtd_lights = int(in_file.readline())
+        primeira = True
+        for i in range(qtd_lights):
+            lgt = list_from_string(in_file.readline())
+            lgt_pos = vector_from_list(lgt[0:3])
+            color_vec = vector_from_list((lgt[3:6]))
+            lgt_color = Color(
+                color_vec.x,
+                color_vec.y,
+                color_vec.z
+            )
+            att = vector_from_list(lgt[6:9])
+            lgt_att = [att.x, att.y, att.z]
+            if (primeira):
+                lights.append(Light(lgt_pos, lgt_color, lgt_att, ambient=True))
+                primeira = False
+            else:
+                lights.append(Light(lgt_pos, lgt_color, lgt_att, ambient=False))
+        
+        # Materiais
+        # Pigmentos
+        pigms = []
+        qtd_pigms = int(in_file.readline())
+        for i in range(qtd_pigms):
+            pigm = list_from_string(in_file.readline())
+            if (pigm[0] == "texmap"):
+                text_file = pigm[1]
+                text_file = path + "/" + text_file
+                p0 = list_from_string(in_file.readline())
+                p0 = Vector(float(p0[0]), float(p0[1]), float(p0[2]))
+                p1 = list_from_string(in_file.readline())
+                p1 = Vector(float(p1[0]), float(p1[1]), float(p1[2]))
+                text = Texture(text_file, u_vector=p0, v_vector=p1)
+                texture_mat = Material(color=Color.from_hex("#000000"), texture=text)
+                pigms.append(texture_mat)
+                img = texture_mat.texture.map
+            elif (pigm[0] == "checker"):
+                cor1 = Color(
+                    float(pigm[1]), 
+                    float(pigm[2]),
+                    float(pigm[3])
+                )
+                cor2 = Color(
+                    float(pigm[4]), 
+                    float(pigm[5]),
+                    float(pigm[6])
+                )
+                tam = float(pigm[7])
+                check = ChequeredMaterial(color1=cor1, color2=cor2, tamanho=tam, up=up)
+                pigms.append(check)
+            elif (pigm[0] == "solid"):
+                color = Color(
+                    float(pigm[1]), 
+                    float(pigm[2]),
+                    float(pigm[3])
+                )
+                solid = Material(color=color)
+                pigms.append(solid)
+        
+        # Acabamentos
+        acabs = []
+        qtd_acabs = int(in_file.readline())
+        for i in range(qtd_acabs):
+            acab_list = list_from_string(in_file.readline())
+            assert len(acab_list) == 7 or len(acab_list) == 8
+            for j in range(len(acab_list)):
+                acab_list[j] = float(acab_list[j])
+            acabs.append(acab_list)
+        
+        # Objetos
+        objects = []
+        qtd_objs = int(in_file.readline())
+        for i in range(qtd_objs):
+            obj_descr = list_from_string(in_file.readline())
+            if (obj_descr[2] == "sphere"):
+                mat = int(obj_descr[0])
+                acab = int(obj_descr[1])
+                centro = Vector(
+                    float(obj_descr[3]), 
+                    float(obj_descr[4]), 
+                    float(obj_descr[5])
+                )
+                raio = float(obj_descr[6])
+                new_material = copy.deepcopy(pigms[mat])
+                new_acab = copy.deepcopy(acabs[acab])
+                new_material.set_acabamento(
+                    new_acab[0],
+                    new_acab[1],
+                    new_acab[2],
+                    new_acab[3],
+                    new_acab[4],
+                    new_acab[5],
+                    new_acab[6]
+                )
+                if (len(new_acab) == 8):
+                    new_material.diff_reflection = new_acab[7]
+                # new_material.color = Color.from_hex("#FFF3F3")
+                esfera = Sphere(centro, raio, new_material)
+                objects.append(esfera)
+            elif (obj_descr[2] == "polyhedron"):
+                mat = int(obj_descr[0])
+                acab = int(obj_descr[1])
+                qtd_faces = int(obj_descr[3])
+                
+                planos = []
+                for j in range(qtd_faces):
+                    face_descr = list_from_string(in_file.readline())
+                    assert len(face_descr) == 4
+                    planos.append([
+                        float(face_descr[0]),
+                        float(face_descr[1]),
+                        float(face_descr[2]),
+                        -float(face_descr[3]),
+                    ])
+                new_material = copy.deepcopy(pigms[mat])
+                new_acab = copy.deepcopy(acabs[acab])
+                new_material.set_acabamento(
+                    new_acab[0],
+                    new_acab[1],
+                    new_acab[2],
+                    new_acab[3],
+                    new_acab[4],
+                    new_acab[5],
+                    new_acab[6]
+                )
+                if (len(new_acab) == 8):
+                    new_material.diff_reflection = new_acab[7]
+                
+                if (type(new_material) == ChequeredMaterial):
+                    new_material.up = Vector(planos[0][0],planos[0][1],planos[0][2])
+                plano = Plane(planos[0], new_material)
+                objects.append(plano)
 
-    os.chdir(os.path.dirname(os.path.abspath(mod.__file__)))
-    with open(mod.RENDERED_IMG, "w") as img_file:
-        image.write_ppm(img_file)
+    # Montagem da cena
+    if movimento:
+        import shutil
+        import imageio
+        images = []
+        filenames = []
+        dirpath = tempfile.mkdtemp()
+        frames_process = 0
+        for j in range(len(tempo_transicoes)):
+            frames_secao = (int)(tempo_transicoes[j] * FPS)
+            for i in range(frames_secao):
+                cam_passo = (posicoes[j+1]["cam_pos"] - posicoes[j]["cam_pos"]) / frames_secao
+                look_at_passo = (posicoes[j+1]["look_at"] - posicoes[j]["look_at"]) / frames_secao
+                up_passo = (posicoes[j+1]["up"] - posicoes[j]["up"]) / frames_secao
+                fov_passo = (posicoes[j+1]["fov"] - posicoes[j]["fov"]) / frames_secao
+                
+                cam_pos = posicoes[j]["cam_pos"] + i * cam_passo
+                look_at = posicoes[j]["look_at"] + i * look_at_passo
+                up = posicoes[j]["up"] + i * up_passo
+                fov = posicoes[j]["fov"] + i * fov_passo
+                camera = Camera(cam_pos, look_at, up, fov, aspect_ratio)
+                scene = Scene(camera, objects, lights, width, height)
+                engine = RenderEngine()
+                qtd_samples = args.samples
 
+                # Raytracing & Render
+                image = engine.render(scene, qtd_samples)
+                file_name = dirpath + f"temp{i}-{j}.ppm"
+                filenames.append(file_name)
+                with open(file_name, "w") as img_file:
+                    image.write_ppm(img_file, qtd_samples)
+                    
+                frames_process += 1
+                print(f"{float(frames_process)/float(total_frames) * 100:3.0f}%") 
+            
+        print("Gerando GIF")      
+        for filename in filenames:
+            images.append(imageio.imread(filename))
+        saida = args.arquivo_saida[0:-4]
+        saida += ".gif"
+        saida = os.path.abspath(saida) 
+        imageio.mimsave(saida, images, "GIF", fps=FPS)
+        shutil.rmtree(dirpath)
+    else:
+        camera = Camera(cam_pos, look_at, up, fov, aspect_ratio)
+        scene = Scene(camera, objects, lights, width, height)
+        engine = RenderEngine()
+        qtd_samples = args.samples
+
+        # Raytracing & Render
+        image = engine.render(scene, qtd_samples)
+        saida = os.path.abspath(args.arquivo_saida) 
+        with open(saida, "w") as img_file:
+            image.write_ppm(img_file, qtd_samples)
 
 
 if __name__ == "__main__":

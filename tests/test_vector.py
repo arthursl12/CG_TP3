@@ -1,5 +1,7 @@
 import pytest
-from vector import Vector
+from modules.vector import (Vector, list_from_string, vector_from_list,
+                            vector_from_string)
+
 
 class TestVector:
     @classmethod
@@ -25,5 +27,30 @@ class TestVector:
     def test_equality(self):
         assert self.v1 == self.v1
 
+class TestFromString:
+    def test_from_string_int(self):
+        string = "1 0 0"
+        assert Vector(1,0,0) == vector_from_string(string)
+    
+    def test_from_string_spaces(self):
+        string = "   1   0     2    "
+        assert Vector(1,0,2) == vector_from_string(string)
+    
+    def test_from_string_float(self):
+        string = "1.0000 0.9998 0.2"
+        assert Vector(1.0, 0.9998, 0.2) == vector_from_string(string)
+    
+    def test_from_string_spaces_int(self):
+        string = "    1.0000         0.9998            0.2 "
+        assert Vector(1.0, 0.9998, 0.2) == vector_from_string(string)
+
+class TestFromList:
+    def test_from_list_int(self):
+        _list = ['1','0','0']
+        assert Vector(1,0,0) == vector_from_list(_list)
+    
+    def test_from_list_float(self):
+        _list = ['1.0000','0.9998','0.2']
+        assert Vector(1.0, 0.9998, 0.2) == vector_from_list(_list)
 
 
