@@ -195,15 +195,3 @@ class ChequeredMaterial:
                 return self.color1
             else:
                 return self.color2
-            # modX = int(position.x) % (self.tamanho * 2.5)
-            # modZ = int(position.z) % (self.tamanho * 2.5)
-            
-            # def corX(modX):
-            #     return (modX <= self.tamanho/4 or modX > self.tamanho * 1.5)
-            # def corZ(modZ):
-            #     return (modZ <= self.tamanho/4 or modZ > self.tamanho * 1.5)
-            
-            # if (corX(modX) != corZ(modZ)):
-            #     return self.color1
-            # else:
-            #     return self.color2

@@ -1,7 +1,6 @@
 import math
 
 from modules.ray import Ray
-from modules.vector import Vector
 
 
 class Camera:

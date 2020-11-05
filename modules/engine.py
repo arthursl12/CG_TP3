@@ -1,11 +1,9 @@
 import math
 import random
 
-from modules.camera import Camera
 from modules.color import Color
 from modules.image import Image
 from modules.light import LightType
-from modules.point import Point
 from modules.ray import Ray
 from modules.sphere import Hit
 from modules.vector import Vector
@@ -22,9 +20,7 @@ class RenderEngine:
         height = scene.height
         aspect_ratio = float(width) / height
         
-        # camera = scene.camera
         camera = scene.camera
-        ## TODO: tratamento do ângulo para (1) não poder ser 90° e (2) não ter tangente negativa
         pixels = Image(width, height)
 
         for j in reversed(range(height)):
@@ -58,6 +54,7 @@ class RenderEngine:
         # Cálculo da Reflexão
         if (depth < self.MAX_DEPTH and obj_hit.material.reflection > 0):
             if (obj_hit.material.diff_reflection > 0):
+                # Reflexão Difusa
                 if (qtd_samples_refl >= 1):
                     RP = ray.direction - 2 * ray.direction.dot_product(hit_normal) * hit_normal
                     new_ray_pos = hit_pos + hit_normal * self.MIN_DISPLACE
@@ -87,6 +84,7 @@ class RenderEngine:
                         )
                         color += rcol * obj_hit.material.reflection * refl
             else:
+                # Reflexão simples
                 new_ray_pos = hit_pos + hit_normal * self.MIN_DISPLACE
                 new_ray_dir = ray.direction - 2 * ray.direction.dot_product(hit_normal) * hit_normal
                 new_ray = Ray(new_ray_pos, new_ray_dir)
@@ -99,10 +97,6 @@ class RenderEngine:
         # Cálculo da Refração
         if (depth < self.MAX_DEPTH and obj_hit.material.refraction > 0):
             refr = obj_hit.material.refraction
-            # rindex = obj_hit.material.refrIndex
-            # n = aRIndex / rindex
-            # rindex = obj_hit.material.ior
-            # rindex = aRIndex / obj_hit.material.ior
             if (case == Hit.INSIDE):
                 refr_ratio = obj_hit.material.ior
             else:
@@ -114,19 +108,6 @@ class RenderEngine:
             magn = (r_out_perp.magnitude()) ** 2
             r_out_parallel = - math.sqrt(abs(1.0 - magn)) * N
             refr_direction = r_out_perp + r_out_parallel
-            # N = hit_normal      # Normal depende se é interna ou externa
-            # cosI  = -(N.dot_product(ray.direction))
-            # cosT2 = 1.0 - n * n * (1.0 - cosI * cosI)
-            # if (cosT2 > 0):
-            #     T = (n * ray.direction) + (n * cosI - math.sqrt(cosT2)) * N
-            #     r = Ray(hit_pos + T * self.MIN_DISPLACE, T)
-            #     rcol, rt, raRIndex = self.ray_trace(r, scene, depth=depth+1, aRIndex=rindex, t=float('inf'), color=Color(0,0,0))
-            #     absorb = self.color_at(obj_hit, hit_pos, hit_normal, scene, ray) * 0.15 * -t
-            #     transp = Color(
-            #         math.exp(absorb.x), 
-            #         math.exp(absorb.y), 
-            #         math.exp(absorb.z)
-            #     )
             r = Ray(hit_pos - N * self.MIN_DISPLACE, refr_direction)
             rcol, rt, raRIndex = self.ray_trace(r, scene, depth=depth+1, aRIndex=aRIndex, t=float('inf'), color=Color(0,0,0))
             rcol = Color(rcol.x, rcol.y, rcol.z)
@@ -194,17 +175,7 @@ class RenderEngine:
                         diffuse_coeff
                         * obj_color.color_prod(light.color)
                     )
-                
-                
-                
-                # Specular (Blinn-Phong)
-                # half_vector = (to_light.direction + to_cam).normalize()
-                # color += (
-                #     light.color 
-                #     * material.specular 
-                #     * max(normal.dot_product(half_vector), 0) ** specular_k
-                # )
-                
+                # Especular
                 if (material.specular > 0):
                     V = ray.direction
                     R = inter_to_light - 2.0 * inter_to_light.dot_product(normal) * normal

@@ -3,9 +3,7 @@
 """
 import argparse
 import copy
-import importlib
 import os
-import pathlib
 import tempfile
 
 from modules.camera import Camera

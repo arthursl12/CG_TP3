@@ -1,5 +1,3 @@
-from math import sqrt
-
 from modules.color import Color
 
 

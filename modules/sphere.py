@@ -1,7 +1,7 @@
-from math import sqrt, acos, pi, sin
-from modules.color import Color
 from enum import Enum
-from modules.vector import Vector
+from math import sqrt
+
+
 class Hit(Enum):
     MISS = 0
     INSIDE = -1
